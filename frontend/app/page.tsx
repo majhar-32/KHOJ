@@ -1,6 +1,6 @@
 import { getCategories, getEvents } from "@/lib/mockApi";
 import { EventCard } from "@/components/EventCard";
-import { Search } from "lucide-react";
+import { AISearchBar } from "@/components/AISearchBar";
 
 export default async function Home() {
   const [events, categories] = await Promise.all([
@@ -28,14 +28,7 @@ export default async function Home() {
           </p>
           
           <div className="max-w-2xl mx-auto relative group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-neutral-400 group-focus-within:text-primary-500 transition-colors" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search for events, categories, or organizers..."
-              className="block w-full pl-11 pr-4 py-4 rounded-xl border border-neutral-300 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-neutral-900"
-            />
+            <AISearchBar />
           </div>
         </div>
       </section>

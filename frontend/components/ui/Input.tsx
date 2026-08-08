@@ -1,7 +1,7 @@
 import { InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, forwardRef, ReactNode } from "react";
 
 interface FieldWrapperProps {
-  label?: string;
+  label?: ReactNode;
   error?: string;
   hint?: string;
   id?: string;
@@ -35,8 +35,8 @@ const fieldBaseClasses = (hasError?: boolean) =>
     hasError ? "border-error-500" : "border-neutral-300",
   ].join(" ");
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "label"> {
+  label?: ReactNode;
   error?: string;
   hint?: string;
 }
@@ -56,8 +56,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = "Input";
 
-interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
+interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "label"> {
+  label?: ReactNode;
   error?: string;
   hint?: string;
 }
@@ -78,8 +78,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 );
 Textarea.displayName = "Textarea";
 
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string;
+interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "label"> {
+  label?: ReactNode;
   error?: string;
   hint?: string;
 }

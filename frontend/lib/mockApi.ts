@@ -80,3 +80,104 @@ export async function createEvent(eventData: Omit<KhojEvent, "id" | "status" | "
   events.push(newEvent);
   return delay(newEvent);
 }
+
+// ----------------------------------------------------------------
+// AI Simulation Helpers
+// ----------------------------------------------------------------
+
+export async function simulateAIExtraction(rawText: string): Promise<Partial<KhojEvent>> {
+  // Simulate network delay (1.5 - 2.5s)
+  await delay(null, Math.random() * 1000 + 1500);
+
+  // Simulate 15% failure rate
+  if (Math.random() < 0.15) {
+    throw new Error("AI could not extract structured data from this text.");
+  }
+
+  const result: Partial<KhojEvent> = {};
+  const lowerText = rawText.toLowerCase();
+
+  // Basic category matching
+  const categories = await getCategories();
+  for (const cat of categories) {
+    if (lowerText.includes(cat.toLowerCase())) {
+      result.category = cat;
+      break;
+    }
+  }
+
+  // Basic fee extraction
+  if (lowerText.includes("free") || lowerText.includes("no fee")) {
+    result.registrationFee = "Free";
+  } else {
+    const feeMatch = rawText.match(/(?:৳|Tk\.?|BDT)\s*(\d+)/i);
+    if (feeMatch) {
+      result.registrationFee = `৳${feeMatch[1]}`;
+    }
+  }
+
+  // Basic team size
+  if (lowerText.includes("individual") || lowerText.includes("solo")) {
+    result.teamSize = "1";
+  } else {
+    const teamMatch = lowerText.match(/(?:team of|team size)\s*(\d+(?:-\d+)?)/i) || lowerText.match(/(\d+(?:-\d+)?)\s*members/i);
+    if (teamMatch) {
+      result.teamSize = teamMatch[1];
+    }
+  }
+
+  // Basic deadline extraction (mocked offset)
+  if (lowerText.includes("deadline") || lowerText.includes("last date") || lowerText.includes("register by")) {
+    // Just mock it to 7 days from now for simulation
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    result.registrationDeadline = nextWeek.toISOString().split("T")[0];
+  }
+
+  return result;
+}
+
+export async function simulateAISearch(query: string): Promise<{ category?: string; city?: string; mode?: "online" | "offline"; deadlineBefore?: string }> {
+  await delay(null, Math.random() * 1000 + 1000);
+  
+  const result: { category?: string; city?: string; mode?: "online" | "offline"; deadlineBefore?: string } = {};
+  const lowerQuery = query.toLowerCase();
+
+  // Category
+  const categories = await getCategories();
+  for (const cat of categories) {
+    if (lowerQuery.includes(cat.toLowerCase())) {
+      result.category = cat;
+      break;
+    }
+  }
+
+  // City (Hardcoded a few common ones for simulation)
+  const cities = ["Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna"];
+  for (const city of cities) {
+    if (lowerQuery.includes(city.toLowerCase())) {
+      result.city = city;
+      break;
+    }
+  }
+
+  // Mode
+  if (lowerQuery.includes("online") || lowerQuery.includes("virtual")) {
+    result.mode = "online";
+  } else if (lowerQuery.includes("offline") || lowerQuery.includes("in person")) {
+    result.mode = "offline";
+  }
+
+  // Relative deadline
+  if (lowerQuery.includes("this week")) {
+    const endOfWeek = new Date();
+    endOfWeek.setDate(endOfWeek.getDate() + (7 - endOfWeek.getDay()));
+    result.deadlineBefore = endOfWeek.toISOString().split("T")[0];
+  } else if (lowerQuery.includes("next month")) {
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    result.deadlineBefore = nextMonth.toISOString().split("T")[0];
+  }
+
+  return result;
+}

@@ -1,6 +1,8 @@
 import { getEvents, getCategories } from "@/lib/mockApi";
 import { BrowseEventsClient } from "@/components/BrowseEventsClient";
 
+import { Suspense } from "react";
+
 export const dynamic = 'force-dynamic';
 
 export default async function BrowseEventsPage() {
@@ -11,7 +13,9 @@ export default async function BrowseEventsPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <BrowseEventsClient initialEvents={events} categories={categories} />
+      <Suspense fallback={<div className="p-8 text-center">Loading events...</div>}>
+        <BrowseEventsClient initialEvents={events} categories={categories} />
+      </Suspense>
     </div>
   );
 }

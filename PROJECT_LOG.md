@@ -106,3 +106,22 @@
 
 ### Open questions / next steps
 - The core frontend user flow is now complete (Public discovery -> Organizer submission -> Admin approval). Next step is to integrate a real backend database (Node.js/PostgreSQL).
+
+---
+
+## Phase F5 — AI Integration UI (Simulated)
+**Status:** ✅ Complete
+
+### What was built
+- **Mock AI Logic (`frontend/lib/mockApi.ts`)**: Added `simulateAIExtraction(rawText)` and `simulateAISearch(query)` using `Math.random()` to simulate network delays (1-2.5s) and basic substring/regex matching to extract categories, fees, team sizes, deadlines, cities, and modes. Added a 15% random failure rate to the extraction function.
+- **AI-Assisted Event Submission (`frontend/components/SubmitEventForm.tsx`)**: Added a visually distinct "AI-Assisted Autofill" section at the top of the form with a `Sparkles` icon. It tracks successfully filled fields using a `Set` and displays an "AI-filled" badge on the respective input labels. The badge is removed if the user manually edits the field. Fallback error states are handled gracefully.
+- **AI-Powered Natural Language Search (`frontend/components/AISearchBar.tsx` & `BrowseEventsClient.tsx`)**: Replaced the visual-only search bar on the Landing Page with an `AISearchBar` component that redirects to `/events?q=...`. `BrowseEventsClient` parses the query on mount, simulates the AI search, and displays the interpreted filters as removable chips above the results, fully syncing with the manual filter dropdowns.
+
+### Decisions made
+- Changed the `label` prop in `components/ui/Input.tsx` to accept a `ReactNode` instead of a `string` to easily inject the "AI-filled" badge.
+- Used `router.replace` in `BrowseEventsClient` to update the URL with the query without causing a full page reload or breaking browser history.
+- The AI simulation functions do not use any real LLM or API keys, ensuring this phase purely focuses on the UX/UI interactions.
+
+### Open questions / next steps
+- Run `npm run lint` and `npm run build` manually to verify the build, and test the AI features in the browser.
+- Await confirmation to proceed to Phase F6.
