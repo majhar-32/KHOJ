@@ -58,7 +58,7 @@ export function OrganizerDashboardClient({ events, organizerName }: { events: Kh
               {events.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-neutral-500">
-                    You haven't submitted any events yet.
+                    You haven&apos;t submitted any events yet.
                   </td>
                 </tr>
               ) : (

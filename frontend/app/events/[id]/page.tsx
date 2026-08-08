@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { 
   Calendar, Clock, MapPin, Monitor, Ticket, Trophy, 
-  Users, Award, Bookmark, ExternalLink, Mail, Phone
+  Users, Award, Bookmark, ExternalLink
 } from "lucide-react";
 import Link from "next/link";
 
@@ -17,8 +17,9 @@ const bannerToneClasses: Record<string, string> = {
   default: "bg-neutral-100",
 };
 
-export default async function EventDetailsPage({ params }: { params: { id: string } }) {
-  const event = await getEventById(params.id);
+export default async function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const event = await getEventById(id);
 
   if (!event) {
     notFound();

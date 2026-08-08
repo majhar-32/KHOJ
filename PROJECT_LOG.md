@@ -98,5 +98,11 @@
 - Kept the dashboards mobile-responsive using Tailwind utility classes (e.g., overflow-x-auto for tables on small screens).
 - Submitting the form actually pushes a new event into the `mockApi.ts` in-memory array, meaning it will instantly show up on the Admin dashboard (until the dev server restarts).
 
+### Critical Review Fixes Applied (Phase F3/F4)
+- Fixed `AdminDashboardClient.tsx` where `Modal` was using `isOpen` instead of the correct `open` prop, preventing the modal from opening and breaking the build.
+- Fixed `events/[id]/page.tsx` dynamic route where `params` wasn't being awaited, fixing a 404 error in Next.js 16 (`const { id } = await params;`).
+- Escaped the apostrophe in `OrganizerDashboardClient.tsx` to fix ESLint error.
+- Removed unused imports across `events/[id]/page.tsx`, `BrowseEventsClient.tsx`, and `SubmitEventForm.tsx`.
+
 ### Open questions / next steps
 - The core frontend user flow is now complete (Public discovery -> Organizer submission -> Admin approval). Next step is to integrate a real backend database (Node.js/PostgreSQL).

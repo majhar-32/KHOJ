@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createEvent, getCategories } from "@/lib/mockApi";
-import { KhojEvent } from "@/lib/types";
+import { createEvent } from "@/lib/mockApi";
+
 import { Card } from "@/components/ui/Card";
 import { Input, Textarea, Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";

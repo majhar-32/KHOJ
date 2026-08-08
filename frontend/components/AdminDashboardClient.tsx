@@ -183,7 +183,7 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
 
       {/* Reject Modal */}
       <Modal
-        isOpen={!!rejectingEvent}
+        open={!!rejectingEvent}
         onClose={() => {
           setRejectingEvent(null);
           setRejectionReason("");

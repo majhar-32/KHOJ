@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { KhojEvent } from "@/lib/types";
 import { EventCard } from "@/components/EventCard";
 import { Search, FilterX } from "lucide-react";
-import { Input, Select } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
 interface BrowseEventsClientProps {
