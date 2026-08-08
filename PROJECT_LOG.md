@@ -63,5 +63,40 @@
 - Added `.hide-scrollbar` utility classes to `globals.css` to properly hide horizontal scrollbars on the category chips.
 - Pushed Phase F2 and fixes to GitHub.
 
+---
+
+## Phase F3 — Browse / Search Screens
+**Status:** ✅ Complete
+
+### What was built
+- **Browse Events Page (`frontend/app/events/page.tsx`)**: The main discovery page with search and filtering.
+- **BrowseEventsClient Component (`frontend/components/BrowseEventsClient.tsx`)**: Client-side component that handles state for the search query and filters (Category, City, Mode) and displays the filtered list of events using the `EventCard`. Includes an empty state.
+- **Event Details Page (`frontend/app/events/[id]/page.tsx`)**: A dynamic route for individual events, featuring a hero banner, key details grid, tabbed-like content sections (Description, Rules, Eligibility), and an action bar that becomes sticky on mobile.
+
+### Decisions made
+- Implemented client-side filtering for the browse page since the dataset is currently mocked and small.
+- Placed the filters in a horizontal bar above the results for a mobile-first, cleaner layout (as opposed to a heavy sidebar).
+- Handled the `bannerColor` lookup inside the Event Details page the same way as `EventCard`.
+
 ### Open questions / next steps
-- Waiting for user approval on Phase F2 before moving on to Phase F3 (Browse/Search screens).
+- Run lint, build, and git commit/push manually (due to sandbox restrictions).
+- Await confirmation to proceed to Phase F4 (Organizer/Admin screens).
+
+---
+
+## Phase F4 — Organizer & Admin Dashboards
+**Status:** ✅ Complete
+
+### What was built
+- **Mock API Expansion (`frontend/lib/mockApi.ts`)**: Added a `createEvent` function to mock the addition of newly submitted events.
+- **Organizer Dashboard (`/dashboard/organizer`)**: A page displaying the logged-in organizer's events (mocked as "BUET Computer Club") showing their approval status, deadlines, and actions to view/edit. Included a summary statistics section (Total, Approved, Pending).
+- **Event Submission Form (`/dashboard/organizer/submit`)**: A comprehensive multi-step form gathering all necessary details about a new event, including categories, dates, modes (online/offline conditional logic), fees, and links.
+- **Admin Dashboard (`/dashboard/admin`)**: A central hub for admins to review all events on the platform. Focuses heavily on the "Pending Review" queue with quick inline actions to Approve or Reject.
+- **Reject Modal**: Added a modal to capture a rejection reason when an Admin rejects an event.
+
+### Decisions made
+- Kept the dashboards mobile-responsive using Tailwind utility classes (e.g., overflow-x-auto for tables on small screens).
+- Submitting the form actually pushes a new event into the `mockApi.ts` in-memory array, meaning it will instantly show up on the Admin dashboard (until the dev server restarts).
+
+### Open questions / next steps
+- The core frontend user flow is now complete (Public discovery -> Organizer submission -> Admin approval). Next step is to integrate a real backend database (Node.js/PostgreSQL).

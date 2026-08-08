@@ -69,3 +69,14 @@ export async function rejectEvent(id: string, reason: string): Promise<KhojEvent
   }
   return delay(event);
 }
+
+export async function createEvent(eventData: Omit<KhojEvent, "id" | "status" | "saved">): Promise<KhojEvent> {
+  const newEvent: KhojEvent = {
+    ...eventData,
+    id: `ev_${Date.now()}`,
+    status: "pending",
+    saved: false,
+  };
+  events.push(newEvent);
+  return delay(newEvent);
+}
