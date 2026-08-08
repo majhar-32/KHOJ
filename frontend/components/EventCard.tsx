@@ -1,8 +1,16 @@
 import { KhojEvent } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { CategoryTag, DeadlineBadge, StatusChip } from "@/components/ui/Badge";
-import { MapPin, Monitor, Building2, Ticket } from "lucide-react";
+import { MapPin, Monitor, Ticket } from "lucide-react";
 import Link from "next/link";
+
+const bannerToneClasses: Record<string, string> = {
+  primary: "bg-primary-50",
+  success: "bg-success-50",
+  warning: "bg-warning-50",
+  error: "bg-error-50",
+  default: "bg-neutral-100",
+};
 
 export function EventCard({ event, showStatus = false }: { event: KhojEvent; showStatus?: boolean }) {
   // Calculate days left
@@ -15,8 +23,7 @@ export function EventCard({ event, showStatus = false }: { event: KhojEvent; sho
       <Card padded={false} className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow group">
         {/* Mock Banner */}
         <div 
-          className="h-32 w-full shrink-0 relative p-4 flex flex-col justify-between"
-          style={{ backgroundColor: event.bannerColor }}
+          className={`h-32 w-full shrink-0 relative p-4 flex flex-col justify-between ${bannerToneClasses[event.bannerColor] || bannerToneClasses.default}`}
         >
           <div className="flex justify-between items-start gap-2">
             <CategoryTag label={event.category} />

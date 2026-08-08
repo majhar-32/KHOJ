@@ -56,5 +56,12 @@
 - Added a `showStatus` prop to `EventCard` (default false) to optionally hide the status chip on public screens.
 - Authentication screens simply set the dev RoleContext to simulate logging in, as real auth doesn't exist yet.
 
+### Review fixes applied
+- Fixed `EventCard` banner colors by mapping mock data tone strings ("primary", "success", etc.) to real Tailwind background classes (`bg-primary-50`, etc.) using a lookup object. Removed inline styles.
+- Removed unused `Building2` import in `EventCard.tsx`.
+- Escaped apostrophe in `login/page.tsx` to fix ESLint error.
+- Added `.hide-scrollbar` utility classes to `globals.css` to properly hide horizontal scrollbars on the category chips.
+- Pushed Phase F2 and fixes to GitHub.
+
 ### Open questions / next steps
 - Waiting for user approval on Phase F2 before moving on to Phase F3 (Browse/Search screens).
