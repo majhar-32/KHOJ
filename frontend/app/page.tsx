@@ -1,22 +1,73 @@
-export default function Home() {
+import { getCategories, getEvents } from "@/lib/mockApi";
+import { EventCard } from "@/components/EventCard";
+import { Search } from "lucide-react";
+
+export default async function Home() {
+  const [events, categories] = await Promise.all([
+    getEvents(),
+    getCategories(),
+  ]);
+
+  // Sort by nearest deadline, keeping only those in the future (or all, if we want to show closing soon)
+  const now = new Date().getTime();
+  const closingSoon = [...events]
+    .filter((e) => new Date(e.registrationDeadline).getTime() > now)
+    .sort((a, b) => new Date(a.registrationDeadline).getTime() - new Date(b.registrationDeadline).getTime())
+    .slice(0, 6);
+
   return (
-    <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
-      <div className="mx-auto max-w-xl text-center">
-        <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">
-          Khoj — Frontend Setup Complete
-        </h1>
-        <p className="mt-3 text-sm text-neutral-600 sm:text-base">
-          Project scaffold, design system, reusable components, and mock data
-          are ready. The Landing page and the rest of the screens will be
-          built in the next phases.
-        </p>
-        <p className="mt-4 text-sm">
-          Check the component library at{" "}
-          <a href="/dev/components" className="font-medium text-primary-600 underline">
-            /dev/components
-          </a>
-        </p>
-      </div>
+    <div className="min-h-screen bg-neutral-50 pb-20">
+      {/* Hero Section */}
+      <section className="bg-white border-b border-neutral-200 pt-16 pb-12 px-4 sm:px-6">
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-5xl md:text-6xl mb-6">
+            Discover Your Next <span className="text-primary-600">Opportunity</span>
+          </h1>
+          <p className="text-lg text-neutral-600 mb-8 max-w-2xl mx-auto">
+            Find hackathons, workshops, and contests happening across Bangladesh. Centralized in one place.
+          </p>
+          
+          <div className="max-w-2xl mx-auto relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-neutral-400 group-focus-within:text-primary-500 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search for events, categories, or organizers..."
+              className="block w-full pl-11 pr-4 py-4 rounded-xl border border-neutral-300 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-neutral-900"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Row */}
+      <section className="px-4 sm:px-6 py-6 border-b border-neutral-200 bg-white">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="flex overflow-x-auto pb-4 -mb-4 hide-scrollbar gap-2 snap-x">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className="snap-start shrink-0 px-4 py-2 rounded-full border border-neutral-200 bg-neutral-50 text-neutral-700 text-sm font-medium hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Closing Soon */}
+      <section className="px-4 sm:px-6 py-12 mx-auto max-w-[1280px]">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold text-neutral-900">Closing Soon</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {closingSoon.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

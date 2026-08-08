@@ -38,4 +38,23 @@
 - No git repository has been initialized yet in this folder — that's the first task for the next session.
 
 ### Open questions / next steps
-- None blocking. Next session should: initialize git, connect the existing GitHub remote, push, then continue to the next frontend phase (public/onboarding screens: Landing, Sign Up, Login) using mock data and the role switcher already in place.
+- None blocking. Next session should: continue to the next frontend phase (Browse/Search screens) using mock data and the role switcher already in place.
+
+---
+
+## Phase F2 — Public / Onboarding Screens
+**Status:** ✅ Complete
+
+### What was built
+- **Landing Page (`frontend/app/page.tsx`)**: Hero section with headline and visual search bar. Horizontally-scrollable category chip row pulling from `getCategories()`. Grid of "Closing Soon" event cards pulling from `getEvents()` and sorted by nearest deadline (top 6).
+- **EventCard Component (`frontend/components/EventCard.tsx`)**: Reusable card component to display event details (banner, tags, deadline, organizer, fee, mode/location) consistently.
+- **Sign Up Page (`frontend/app/signup/page.tsx`)**: Card with segmented control for Role selection (Find events vs Publish events). Form fields using existing `Input` component. Temporary auth flow sets the dev role switcher context and redirects to Home.
+- **Login Page (`frontend/app/login/page.tsx`)**: Card with email/password fields. Temporary auth flow sets the dev role switcher context to 'user' and redirects to Home.
+
+### Decisions made
+- Kept search bar on Landing Page as visual-only for now, to be integrated with real search later.
+- Added a `showStatus` prop to `EventCard` (default false) to optionally hide the status chip on public screens.
+- Authentication screens simply set the dev RoleContext to simulate logging in, as real auth doesn't exist yet.
+
+### Open questions / next steps
+- Waiting for user approval on Phase F2 before moving on to Phase F3 (Browse/Search screens).
