@@ -153,7 +153,8 @@ export async function simulateAISearch(query: string): Promise<{ category?: stri
   }
 
   // City (Hardcoded a few common ones for simulation)
-  const cities = ["Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna"];
+  // Derive city list dynamically from event data so it always matches exactly
+  const cities = Array.from(new Set(events.map((e) => e.city).filter(Boolean)));
   for (const city of cities) {
     if (lowerQuery.includes(city.toLowerCase())) {
       result.city = city;

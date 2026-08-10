@@ -125,3 +125,7 @@
 ### Open questions / next steps
 - Run `npm run lint` and `npm run build` manually to verify the build, and test the AI features in the browser.
 - Await confirmation to proceed to Phase F6.
+
+### Post-review fix applied
+- **Bug:** `simulateAISearch` used a hardcoded city list (`["Dhaka", "Chittagong", ...]`) while the mock data uses `"Chattogram"`. This caused city matching to silently produce zero results.
+- **Fix:** Replaced the hardcoded array with a dynamic derivation: `Array.from(new Set(events.map(e => e.city).filter(Boolean)))` — the same pattern already used by `getCategories()`. City names will now always match the mock data exactly, and the class of mismatch can't recur as data evolves.
