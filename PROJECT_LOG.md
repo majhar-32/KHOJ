@@ -171,3 +171,73 @@
 ### Open questions / next steps
 - Please run `npm run build` locally to confirm no TypeScript errors from these changes.
 - Await confirmation to proceed to Phase F7.
+
+---
+
+## Phase F7 — Remaining Frontend Screens
+**Status:** ✅ Complete
+
+### What was built
+
+#### Data layer (`lib/mockApi.ts` + `lib/types.ts`)
+- Added `KhojUser` and `KhojCategory` types to `types.ts`.
+- Added a proper `categories` in-memory store in `mockApi.ts`, seeded from event data at startup. Added `getCategoriesWithCounts()`, `addCategory()`, `renameCategory()`, `deleteCategory()` (with in-use guard). Updated internal AI helpers to use the new store.
+- Added a `users` in-memory array with 12 realistic mock users and `getUsers()`, `suspendUser()`, `reactivateUser()` functions.
+- Added `updateEvent(id, data)` — sets status back to `"pending"` if the event was previously `"approved"`.
+
+#### Save / Bookmark wiring
+- `EventCard.tsx` converted to a client component with a Bookmark button (top-right corner of banner) wired to `toggleSaveEvent`. Optimistic UI updates the icon immediately and shows a `Toast` confirmation.
+- Event Details page split into a thin server shell (`app/events/[id]/page.tsx`) + `EventDetailsClient.tsx` (client component). Save button wired, toast shown. Register Now links to the real `registrationLink`.
+
+#### Share Modal (Event Details)
+- Added a Share button (Share2 icon) next to Save on the Event Details page.
+- Modal shows event title, a read-only shareable URL with a Copy button (clipboard API, "Copied!" feedback), and real functional share links for WhatsApp, Facebook, LinkedIn, and Email.
+
+#### Saved Events page (`/saved`)
+- Lists all saved events in the same card grid as Browse.
+- Empty state: Bookmark icon + friendly message + "Browse Events" button.
+- Navbar Bookmark icon now links here.
+
+#### Upcoming Deadlines page (`/deadlines`)
+- Fetches saved events, filters to upcoming deadlines only, sorts ascending, and groups into: "Closing in 24 hours", "This week", "This month", "Later". Events past their deadline are excluded. Items with no future deadline (outside 30 days) go into "Later".
+- List format (not card grid) — each row shows event name (link), CategoryTag, date, DeadlineBadge, and a "Register" button opening the registration link in a new tab.
+- Empty state: Clock icon + message + "Browse Events" button.
+- Navbar Clock icon links here.
+
+#### Organizer Edit Event (`/dashboard/organizer/edit/[id]`)
+- `SubmitEventForm.tsx` extended with `mode: "create" | "edit"` and `initialData?: KhojEvent` props.
+- In edit mode: form pre-filled from event data, AI-assist section hidden (keeps focus on reviewing existing data), submit button says "Save Changes", calls `updateEvent()`.
+- If event is currently `approved`, a yellow warning banner explains re-approval is required. `updateEvent` sets status back to `"pending"` automatically.
+- The Edit button in `OrganizerDashboardClient` now navigates to this page. **Decision:** Edit button is still only shown for non-approved events; approved events don't show it. This is intentional — the warning banner covers the case where an organizer edits an approved event (they'd need to view it first and click a link — revisit if UX feedback demands it).
+
+#### Admin Category Management (`/dashboard/admin/categories`)
+- `CategoryManagerClient.tsx`: Add category (form at top), list with rename (inline edit) and delete. Delete is disabled with a tooltip if any event uses that category — the `deleteCategory()` API enforces this and returns a reason string for the UI error banner.
+- Linked from Admin nav items in Navbar.
+
+#### Admin User Management (`/dashboard/admin/users`)
+- `UserManagerClient.tsx`: searchable by name/email, filterable by role and status, table showing name/email/role/verified badge/joined date/status. Suspend/Reactivate with a confirmation modal (reuses `Modal` component).
+- Empty state if search/filter yields no results.
+- Linked from Admin nav items in Navbar.
+
+#### Navigation updates (Navbar)
+- Bookmark icon → `/saved`
+- Clock icon → `/deadlines`
+- Admin role: nav shows Events, Categories, Users links
+- Organizer role: nav shows My Events link + dashboard icon
+- Search icon → redirects to `/` (Landing has the real search bar)
+
+### Architectural decision: Category store
+The previous `getCategories()` derived categories live from event data. This meant categories couldn't exist without events. A proper `categories` in-memory array is now seeded from the unique event categories at startup. `getCategories()` still works identically (returns names sorted) — all existing callers are unchanged. `getCategoriesWithCounts()` is the new function used by the admin screen.
+
+### `npm run lint` output
+```
+> frontend@0.1.0 lint
+> eslint
+
+(no output — clean)
+```
+`npm run build` is blocked by sandbox network restrictions.
+
+### Open questions / next steps
+- Await confirmation to proceed to Phase F8.
+- The Organizer Edit button is only shown for non-approved events — if you want approved events to also be editable (with the re-approval warning), let me know and I'll add it.

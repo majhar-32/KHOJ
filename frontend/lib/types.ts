@@ -32,3 +32,21 @@ export interface KhojEvent {
   rejectionReason?: string;
   saved?: boolean;
 }
+
+export type UserRole = "user" | "organizer";
+export type UserStatus = "active" | "suspended";
+
+export interface KhojUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  verified: boolean;
+  status: UserStatus;
+  joinedDate: string; // ISO date
+}
+
+export interface KhojCategory {
+  id: string;
+  name: string;
+}
