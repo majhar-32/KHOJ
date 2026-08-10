@@ -95,13 +95,11 @@ export function OrganizerDashboardClient({ events, organizerName }: { events: Kh
                               <Eye className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </Link>
-                          {event.status !== "approved" && (
-                            <Link href={`/dashboard/organizer/edit/${event.id}`}>
-                              <Button variant="ghost" size="sm" aria-label={`Edit ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
-                                <Edit2 className="w-4 h-4" aria-hidden="true" />
-                              </Button>
-                            </Link>
-                          )}
+                          <Link href={`/dashboard/organizer/edit/${event.id}`}>
+                            <Button variant="ghost" size="sm" aria-label={`Edit ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
+                              <Edit2 className="w-4 h-4" aria-hidden="true" />
+                            </Button>
+                          </Link>
                         </div>
                       </td>
                     </tr>

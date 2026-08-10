@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Bookmark, Clock, FlaskConical, LayoutDashboard, Tags, Users } from "lucide-react";
+import { Search, Bookmark, Clock, FlaskConical, LayoutDashboard, Tags, Users, User } from "lucide-react";
 import { useRole } from "@/context/RoleContext";
 import { Role } from "@/lib/types";
 
@@ -76,6 +76,15 @@ export function Navbar() {
             className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100"
           >
             <Search className="h-5 w-5" aria-hidden="true" />
+          </Link>
+
+          {/* User Profile */}
+          <Link
+            href="/profile"
+            aria-label="User profile"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 ml-2"
+          >
+            <User className="h-5 w-5" aria-hidden="true" />
           </Link>
 
           {/* DEV-ONLY role switcher — remove once real auth exists */}

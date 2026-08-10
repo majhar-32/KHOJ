@@ -240,4 +240,34 @@ The previous `getCategories()` derived categories live from event data. This mea
 
 ### Open questions / next steps
 - Await confirmation to proceed to Phase F8.
-- The Organizer Edit button is only shown for non-approved events — if you want approved events to also be editable (with the re-approval warning), let me know and I'll add it.
+
+---
+
+## Phase F7/F8 Cleanup
+**Status:** ✅ Complete
+
+### What was fixed/built
+
+#### 1. Organizer Dashboard Edit Button
+- Removed the conditional check `event.status !== "approved"` around the Edit button in `OrganizerDashboardClient.tsx`.
+- The Edit button now shows for every event regardless of status, providing a better UX as organizers can easily navigate to the edit screen. The re-approval warning banner handles the consequence correctly if they edit a live event.
+
+#### 2. User Profile / Account Settings Page (`app/profile/page.tsx`)
+- Added a `ProfilePage` client component to handle account settings.
+- Features included:
+  - **Personal Information:** Name field, and a disabled/read-only Email field.
+  - **Change Password:** Two fields for new password and confirm password (purely visual/non-functional for now as there's no backend). Submitting validates if passwords match and shows an alert.
+  - **Log Out:** A button that resets the dev role switcher back to `"user"` and redirects to the homepage (standing in for real logout logic).
+- Added a `User` icon in the Navbar next to the role switcher that links to the new `/profile` page.
+
+### `npm run lint` & `npm run build` output
+```
+> frontend@0.1.0 lint
+> eslint
+
+(no output — clean)
+```
+`npm run build` is blocked by sandbox network/write restrictions (tried to run `npm run lint && npm run build` and was blocked when writing to `.next`).
+
+### Next steps
+- This concludes frontend-only phases. Await confirmation to discuss starting the backend!
