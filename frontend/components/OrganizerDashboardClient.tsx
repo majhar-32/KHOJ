@@ -57,8 +57,9 @@ export function OrganizerDashboardClient({ events, organizerName }: { events: Kh
             <tbody className="divide-y divide-neutral-200 bg-white">
               {events.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-neutral-500">
-                    You haven&apos;t submitted any events yet.
+                  <td colSpan={5} className="px-6 py-14 text-center">
+                    <p className="text-lg font-medium text-neutral-900 mb-1">No events yet</p>
+                    <p className="text-sm text-neutral-500">You haven&apos;t submitted any events. Click &ldquo;Submit New Event&rdquo; to get started.</p>
                   </td>
                 </tr>
               ) : (
@@ -90,13 +91,13 @@ export function OrganizerDashboardClient({ events, organizerName }: { events: Kh
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
                           <Link href={`/events/${event.id}`}>
-                            <Button variant="ghost" size="sm" className="h-8 px-2 text-neutral-500 hover:text-primary-600">
-                              <Eye className="w-4 h-4" />
+                            <Button variant="ghost" size="sm" aria-label={`View ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
+                              <Eye className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </Link>
                           {event.status !== "approved" && (
-                            <Button variant="ghost" size="sm" className="h-8 px-2 text-neutral-500 hover:text-primary-600">
-                              <Edit2 className="w-4 h-4" />
+                            <Button variant="ghost" size="sm" aria-label={`Edit ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
+                              <Edit2 className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           )}
                         </div>

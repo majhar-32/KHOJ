@@ -49,16 +49,17 @@ export function AISearchBar({
   };
 
   return (
-    <form onSubmit={handleSearch} className={className}>
+    <form role="search" onSubmit={handleSearch} className={className}>
       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
         {isSearching ? (
-          <Sparkles className="h-5 w-5 text-primary-500 animate-pulse" />
+          <Sparkles className="h-5 w-5 text-primary-500 animate-pulse" aria-hidden="true" />
         ) : (
-          <Search className="h-5 w-5 text-neutral-400" />
+          <Search className="h-5 w-5 text-neutral-400" aria-hidden="true" />
         )}
       </div>
       <input
-        type="text"
+        type="search"
+        aria-label="Search events"
         placeholder={placeholder}
         value={query}
         onChange={(e) => setQuery(e.target.value)}

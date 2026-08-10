@@ -62,8 +62,8 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
       <td className="px-6 py-4 text-right">
         <div className="flex justify-end gap-2">
           <Link href={`/events/${event.id}`}>
-            <Button variant="ghost" size="sm" className="h-8 px-2 text-neutral-500 hover:text-primary-600">
-              <Eye className="w-4 h-4" />
+            <Button variant="ghost" size="sm" aria-label={`View ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
+              <Eye className="w-4 h-4" aria-hidden="true" />
             </Button>
           </Link>
           {event.status === "pending" && (
@@ -71,20 +71,22 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
               <Button 
                 variant="ghost" 
                 size="sm" 
+                aria-label={`Approve ${event.name}`}
                 className="h-8 px-2 text-success-600 hover:bg-success-50 hover:text-success-700"
                 onClick={() => handleApprove(event.id)}
                 disabled={isProcessing}
               >
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
+                aria-label={`Reject ${event.name}`}
                 className="h-8 px-2 text-error-600 hover:bg-error-50 hover:text-error-700"
                 onClick={() => setRejectingEvent(event)}
                 disabled={isProcessing}
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </Button>
             </>
           )}
@@ -138,8 +140,9 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
                 <tbody className="divide-y divide-neutral-200 bg-white">
                   {pending.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center text-neutral-500">
-                        No events pending review.
+                      <td colSpan={4} className="px-6 py-12 text-center">
+                        <p className="text-lg font-medium text-neutral-900 mb-1">All caught up!</p>
+                        <p className="text-sm text-neutral-500">No events are awaiting review right now.</p>
                       </td>
                     </tr>
                   ) : (
@@ -159,7 +162,11 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-neutral-600">
                   <tbody className="divide-y divide-neutral-200 bg-white">
-                    {approved.slice(0, 5).map(event => <EventRow key={event.id} event={event} />)}
+                    {approved.length === 0 ? (
+                      <tr><td className="px-6 py-8 text-center text-sm text-neutral-400">No approved events yet.</td></tr>
+                    ) : (
+                      approved.slice(0, 5).map(event => <EventRow key={event.id} event={event} />)
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -172,7 +179,11 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-neutral-600">
                   <tbody className="divide-y divide-neutral-200 bg-white">
-                    {rejected.slice(0, 5).map(event => <EventRow key={event.id} event={event} />)}
+                    {rejected.length === 0 ? (
+                      <tr><td className="px-6 py-8 text-center text-sm text-neutral-400">No rejected events.</td></tr>
+                    ) : (
+                      rejected.slice(0, 5).map(event => <EventRow key={event.id} event={event} />)
+                    )}
                   </tbody>
                 </table>
               </div>

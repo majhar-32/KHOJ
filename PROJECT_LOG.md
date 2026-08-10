@@ -129,3 +129,45 @@
 ### Post-review fix applied
 - **Bug:** `simulateAISearch` used a hardcoded city list (`["Dhaka", "Chittagong", ...]`) while the mock data uses `"Chattogram"`. This caused city matching to silently produce zero results.
 - **Fix:** Replaced the hardcoded array with a dynamic derivation: `Array.from(new Set(events.map(e => e.city).filter(Boolean)))` — the same pattern already used by `getCategories()`. City names will now always match the mock data exactly, and the class of mismatch can't recur as data evolves.
+
+---
+
+## Phase F6 — Responsive & Accessibility Polish Pass
+**Status:** ✅ Complete
+
+### What was audited and changed
+
+#### Mobile (375px)
+- All existing screens were reviewed. Tables in Organizer/Admin dashboards already use `overflow-x-auto`. Browse filters were already a horizontal wrapping bar (no sidebar ever existed, so no drawer was needed).
+- No new horizontal overflow issues were found.
+
+#### Keyboard Navigation
+- Added `aria-label` to every icon-only action button across `AdminDashboardClient.tsx` (View, Approve, Reject) and `OrganizerDashboardClient.tsx` (View, Edit) — previously these were tab-reachable but silent to screen readers.
+- Added `aria-label` to the AI chip remove buttons (×) in `BrowseEventsClient.tsx`.
+- Added `role="search"` to the search `<form>` and `aria-label="Search events"` + `type="search"` to the `<input>` in `AISearchBar.tsx`.
+- Added `aria-hidden="true"` to all decorative icons across the above files.
+- Global `:focus-visible` ring in `globals.css` was confirmed intact and not overridden anywhere.
+
+#### Color-only status indicators
+- `StatusChip` (icon + text), `DeadlineBadge` (icon + text), and the new F5 "AI-filled" badge (icon + text) all confirmed non-color-only.
+- AI error message is supplementary text — no issue.
+
+#### Empty states
+- **Organizer Dashboard (0 events):** upgraded from a single text line to a two-line heading + descriptive prompt pointing to the "Submit New Event" button.
+- **Admin — Pending queue (0 events):** upgraded from a single line to a friendly "All caught up! / No events are awaiting review" state.
+- **Admin — Approved table (0 approved):** was previously a blank white card. Added "No approved events yet." message.
+- **Admin — Rejected table (0 rejected):** was previously a blank white card. Added "No rejected events." message.
+- Browse empty state was already correct (heading + descriptive text + Clear button).
+
+### `npm run lint` output
+```
+> frontend@0.1.0 lint
+> eslint
+
+(no output — clean)
+```
+`npm run build` is blocked by sandbox network restrictions (same as previous phases — cannot write to `.next` directory).
+
+### Open questions / next steps
+- Please run `npm run build` locally to confirm no TypeScript errors from these changes.
+- Await confirmation to proceed to Phase F7.

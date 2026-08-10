@@ -209,25 +209,25 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
               {aiFilters.category && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
                   Category: {aiFilters.category}
-                  <button onClick={() => removeAIFilter("category")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" /></button>
+                  <button aria-label="Remove category filter" onClick={() => removeAIFilter("category")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
                 </span>
               )}
               {aiFilters.city && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
                   City: {aiFilters.city}
-                  <button onClick={() => removeAIFilter("city")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" /></button>
+                  <button aria-label="Remove city filter" onClick={() => removeAIFilter("city")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
                 </span>
               )}
               {aiFilters.mode && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
                   Mode: {aiFilters.mode}
-                  <button onClick={() => removeAIFilter("mode")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" /></button>
+                  <button aria-label="Remove mode filter" onClick={() => removeAIFilter("mode")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
                 </span>
               )}
               {aiFilters.deadlineBefore && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
                   Deadline before: {aiFilters.deadlineBefore}
-                  <button onClick={() => removeAIFilter("deadlineBefore")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" /></button>
+                  <button aria-label="Remove deadline filter" onClick={() => removeAIFilter("deadlineBefore")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
                 </span>
               )}
             </div>
