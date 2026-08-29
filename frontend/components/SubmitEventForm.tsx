@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createEvent, updateEvent } from "@/lib/eventsApi";
-import { simulateAIExtraction } from "@/lib/mockApi";
+import { createEvent, updateEvent, extractEvent } from "@/lib/eventsApi";
 import { KhojEvent } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { Input, Textarea, Select } from "@/components/ui/Input";
@@ -73,16 +72,28 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
     setIsExtracting(true);
     setAiError(null);
     try {
-      const extracted = await simulateAIExtraction(rawAIText);
+      const extracted = await extractEvent(rawAIText, token);
       const newlyFilled = new Set<string>();
       const updatedData = { ...formData };
       for (const [key, value] of Object.entries(extracted)) {
-        if (value) {
-          (updatedData as Record<string, unknown>)[key] = value;
+        if (value !== undefined && value !== null && value !== "") {
+          let finalVal = value;
+          if (key === "eventTime" && typeof value === "string") {
+            const match = value.trim().match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i);
+            if (match) {
+              let hours = parseInt(match[1], 10);
+              const minutes = match[2];
+              const modifier = match[3]?.toUpperCase();
+              if (modifier === "PM" && hours < 12) hours += 12;
+              if (modifier === "AM" && hours === 12) hours = 0;
+              finalVal = `${hours.toString().padStart(2, "0")}:${minutes}`;
+            }
+          }
+          (updatedData as Record<string, unknown>)[key] = finalVal;
           newlyFilled.add(key);
         }
       }
-      if (rawAIText) {
+      if (rawAIText && !extracted.description) {
         updatedData.description = rawAIText;
         newlyFilled.add("description");
       }
