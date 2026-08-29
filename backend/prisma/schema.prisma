@@ -1,0 +1,105 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ORGANIZER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum EventStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EventMode {
+  ONLINE
+  OFFLINE
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         Role       @default(USER)
+  verified     Boolean    @default(false)
+  status       UserStatus @default(ACTIVE)
+  createdAt    DateTime   @default(now())
+
+  eventsOrganized Event[]      @relation("OrganizerEvents")
+  savedEvents     SavedEvent[]
+
+  @@map("users")
+}
+
+model Category {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  events Event[]
+
+  @@map("categories")
+}
+
+model Event {
+  id                    String      @id @default(cuid())
+  name                  String
+  category              Category    @relation(fields: [categoryId], references: [id])
+  categoryId            String
+  organizer             User        @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  organizerId           String
+  eventDate             DateTime
+  eventTime             String
+  venue                 String
+  city                  String
+  mode                  EventMode
+  registrationDeadline  DateTime
+  registrationFee       String
+  prizePool             String
+  eligibility           String
+  teamSize              String
+  availableSeats        Int?
+  certificateInfo       String
+  description           String      @db.Text
+  rules                 String      @db.Text
+  contactInfo           String
+  registrationLink      String
+  officialWebsite       String
+  bannerImageUrl        String?
+  status                EventStatus @default(PENDING)
+  rejectionReason       String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  savedBy SavedEvent[]
+
+  @@map("events")
+}
+
+// Join table: which users have saved which events (replaces the mock's boolean `saved` field)
+model SavedEvent {
+  id      String @id @default(cuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  event   Event  @relation(fields: [eventId], references: [id])
+  eventId String
+  savedAt DateTime @default(now())
+
+  @@unique([userId, eventId])
+  @@map("saved_events")
+}

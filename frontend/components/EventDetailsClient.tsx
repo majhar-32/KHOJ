@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { KhojEvent } from "@/lib/types";
-import { toggleSaveEvent } from "@/lib/mockApi";
+import { toggleSaveEvent, getSavedEvents } from "@/lib/eventsApi";
+import { useAuth } from "@/context/AuthContext";
 import { CategoryTag, DeadlineBadge, StatusChip } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -23,20 +24,42 @@ const bannerToneClasses: Record<string, string> = {
 };
 
 export function EventDetailsClient({ event }: { event: KhojEvent }) {
+  const { token, isAuthenticated } = useAuth();
   const [saved, setSaved] = useState(!!event.saved);
   const [toast, setToast] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      getSavedEvents(token)
+        .then((savedEvents) => {
+          setSaved(savedEvents.some((e) => e.id === event.id));
+        })
+        .catch(() => {});
+    } else {
+      setSaved(false);
+    }
+  }, [isAuthenticated, token, event.id]);
 
   const daysLeft = Math.ceil(
     (new Date(event.registrationDeadline).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
   );
 
   const handleSave = async () => {
-    const updated = await toggleSaveEvent(event.id);
-    if (updated !== undefined) {
-      setSaved(!!updated.saved);
-      setToast(updated.saved ? "Saved!" : "Removed from saved");
+    if (!isAuthenticated || !token) return;
+    const nextSaved = !saved;
+    setSaved(nextSaved);
+    setToast(nextSaved ? "Saved!" : "Removed from saved");
+
+    try {
+      const updated = await toggleSaveEvent(event.id, token);
+      if (updated !== undefined) {
+        setSaved(updated.saved);
+      }
+    } catch {
+      setSaved(!nextSaved);
+      setToast("Failed to update bookmark");
     }
   };
 
@@ -80,23 +103,25 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                 </Button>
               </Link>
               <div className="flex gap-2">
+                {isAuthenticated && (
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    className="flex-1 bg-white"
+                    onClick={handleSave}
+                    aria-label={saved ? "Remove from saved" : "Save event"}
+                  >
+                    <Bookmark
+                      className={`w-4 h-4 mr-2 ${saved ? "fill-primary-600 text-primary-600" : ""}`}
+                      aria-hidden="true"
+                    />
+                    {saved ? "Saved" : "Save"}
+                  </Button>
+                )}
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="flex-1 bg-white"
-                  onClick={handleSave}
-                  aria-label={saved ? "Remove from saved" : "Save event"}
-                >
-                  <Bookmark
-                    className={`w-4 h-4 mr-2 ${saved ? "fill-primary-600 text-primary-600" : ""}`}
-                    aria-hidden="true"
-                  />
-                  {saved ? "Saved" : "Save"}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="bg-white"
+                  className={`bg-white ${!isAuthenticated ? "flex-1" : ""}`}
                   onClick={() => setShareOpen(true)}
                   aria-label="Share event"
                 >
@@ -221,9 +246,11 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
         <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
           <Button className="w-full" size="lg">Register Now</Button>
         </Link>
-        <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-white">
-          <Bookmark className={`w-5 h-5 ${saved ? "fill-primary-600 text-primary-600" : ""}`} aria-hidden="true" />
-        </Button>
+        {isAuthenticated && (
+          <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-white">
+            <Bookmark className={`w-5 h-5 ${saved ? "fill-primary-600 text-primary-600" : ""}`} aria-hidden="true" />
+          </Button>
+        )}
       </div>
 
       {/* Share Modal */}

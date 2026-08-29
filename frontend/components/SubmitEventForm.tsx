@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createEvent, updateEvent, simulateAIExtraction } from "@/lib/mockApi";
+import { createEvent, updateEvent } from "@/lib/eventsApi";
+import { simulateAIExtraction } from "@/lib/mockApi";
 import { KhojEvent } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { Input, Textarea, Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Sparkles, AlertTriangle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 type FormMode = "create" | "edit";
 
@@ -20,7 +22,9 @@ interface SubmitEventFormProps {
 
 export function SubmitEventForm({ categories, mode = "create", initialData }: SubmitEventFormProps) {
   const router = useRouter();
+  const { token, user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // AI State (hidden in edit mode — keeps the form focused on reviewing existing data)
   const [rawAIText, setRawAIText] = useState("");
@@ -31,13 +35,13 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
   // Form State — pre-filled from initialData in edit mode
   const [formData, setFormData] = useState({
     name: initialData?.name ?? "",
-    category: initialData?.category ?? categories[0] ?? "",
-    eventDate: initialData?.eventDate ?? "",
+    category: initialData?.category ?? categories[0] ?? "AI Competition",
+    eventDate: initialData?.eventDate ? initialData.eventDate.slice(0, 10) : "",
     eventTime: initialData?.eventTime ?? "",
     mode: (initialData?.mode ?? "offline") as "online" | "offline",
     venue: initialData?.venue ?? "",
     city: initialData?.city ?? "",
-    registrationDeadline: initialData?.registrationDeadline ?? "",
+    registrationDeadline: initialData?.registrationDeadline ? initialData.registrationDeadline.slice(0, 10) : "",
     registrationFee: initialData?.registrationFee ?? "Free",
     prizePool: initialData?.prizePool ?? "",
     eligibility: initialData?.eligibility ?? "",
@@ -94,23 +98,36 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setFormError(null);
+
     try {
+      const payload = {
+        ...formData,
+        city: formData.mode === "online" && !formData.city ? "Online" : formData.city || "Online",
+        venue: formData.mode === "online" && !formData.venue ? "Online" : formData.venue || "Online",
+        prizePool: formData.prizePool || "N/A",
+        certificateInfo: formData.certificateInfo || "N/A",
+        rules: formData.rules || "N/A",
+        officialWebsite: formData.officialWebsite || "",
+        availableSeats: formData.availableSeats ? parseInt(formData.availableSeats, 10) : null,
+      };
+
       if (mode === "edit" && initialData) {
-        await updateEvent(initialData.id, {
-          ...formData,
-          availableSeats: formData.availableSeats ? parseInt(formData.availableSeats, 10) : null,
-        });
+        await updateEvent(initialData.id, payload, token);
       } else {
         await createEvent({
-          ...formData,
-          organizerName: "BUET Computer Club",
-          organizerVerified: true,
-          availableSeats: formData.availableSeats ? parseInt(formData.availableSeats, 10) : null,
-        });
+          ...payload,
+          organizerName: user?.name || "Organizer",
+          organizerVerified: false,
+        }, token);
       }
       router.push("/dashboard/organizer");
-    } catch (error) {
-      console.error("Failed to submit event:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setFormError(error.message);
+      } else {
+        setFormError("Failed to submit event. Please check all fields.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -140,6 +157,12 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
             : "Fill out the details below to submit your event for review."}
         </p>
       </div>
+
+      {formError && (
+        <div className="mb-6 p-4 rounded-xl border border-error-200 bg-error-50 text-error-700 text-sm">
+          {formError}
+        </div>
+      )}
 
       {/* Edit mode banner — warn about re-approval */}
       {mode === "edit" && initialData?.status === "approved" && (

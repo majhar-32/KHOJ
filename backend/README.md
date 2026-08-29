@@ -1,5 +1,35 @@
-# Backend — Not Started Yet
+# Khoj Backend API
 
-This project is being built **frontend-first**. The backend (Node.js + Express + PostgreSQL via Prisma) has not been started.
+Backend service for Khoj — Centralized Event & Contest Discovery Platform.
 
-See the root `PROJECT_LOG.md` for the current plan and progress.
+## Setup & Local Development
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+
+Ensure `PORT` (default: `5000`) and `FRONTEND_URL` (default: `http://localhost:3000`) are set.
+
+### 3. Run Development Server
+```bash
+npm run dev
+```
+
+### 4. Build & Production Run
+```bash
+npm run build
+npm start
+```
+
+### 5. Health Check
+```bash
+curl http://localhost:5000/api/health
+```
+

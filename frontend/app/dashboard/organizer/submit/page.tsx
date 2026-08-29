@@ -1,10 +1,15 @@
-import { getCategories } from "@/lib/mockApi";
+import { getCategories } from "@/lib/eventsApi";
 import { SubmitEventForm } from "@/components/SubmitEventForm";
 
 export const dynamic = 'force-dynamic';
 
 export default async function SubmitEventPage() {
-  const categories = await getCategories();
+  let categories: string[] = [];
+  try {
+    categories = await getCategories();
+  } catch (error) {
+    console.error("Error loading categories:", error);
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">

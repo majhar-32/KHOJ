@@ -1,20 +1,46 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { KhojUser } from "@/lib/types";
-import { suspendUser, reactivateUser } from "@/lib/mockApi";
+import { getUsers, suspendUser, reactivateUser } from "@/lib/usersApi";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Search, ShieldCheck, ShieldOff } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
-export function UserManagerClient({ initialUsers }: { initialUsers: KhojUser[] }) {
-  const [users, setUsers] = useState(initialUsers);
+export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUser[] }) {
+  const { token, user: currentUser, isLoading: authLoading } = useAuth();
+  const [users, setUsers] = useState<KhojUser[]>(initialUsers);
+  const [loading, setLoading] = useState(!initialUsers.length);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState<"all" | "user" | "organizer">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "suspended">("all");
   const [confirmUser, setConfirmUser] = useState<KhojUser | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const fetchUsers = useCallback(async () => {
+    if (!token) return;
+    try {
+      setLoading(true);
+      const data = await getUsers(token);
+      setUsers(data);
+      setError(null);
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchUsers();
+    } else if (!authLoading && !token) {
+      setLoading(false);
+    }
+  }, [token, authLoading, fetchUsers]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -29,14 +55,20 @@ export function UserManagerClient({ initialUsers }: { initialUsers: KhojUser[] }
   const handleConfirmAction = async () => {
     if (!confirmUser) return;
     setIsProcessing(true);
-    const updated = confirmUser.status === "active"
-      ? await suspendUser(confirmUser.id)
-      : await reactivateUser(confirmUser.id);
-    if (updated) {
-      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+    setError(null);
+    try {
+      const updated = confirmUser.status === "active"
+        ? await suspendUser(confirmUser.id, token)
+        : await reactivateUser(confirmUser.id, token);
+      if (updated) {
+        setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+      }
+      setConfirmUser(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to update user status.");
+    } finally {
+      setIsProcessing(false);
     }
-    setConfirmUser(null);
-    setIsProcessing(false);
   };
 
   return (
@@ -45,6 +77,12 @@ export function UserManagerClient({ initialUsers }: { initialUsers: KhojUser[] }
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">User Management</h1>
         <p className="text-neutral-600">Search, filter, and manage platform users.</p>
       </div>
+
+      {error && (
+        <div className="mb-6 rounded-lg border border-error-300 bg-error-50 px-4 py-3 text-sm text-error-700">
+          {error}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3 mb-6">
@@ -98,7 +136,13 @@ export function UserManagerClient({ initialUsers }: { initialUsers: KhojUser[] }
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 bg-white">
-              {filtered.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-neutral-400">
+                    Loading users...
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
                     <p className="text-lg font-medium text-neutral-900 mb-1">No users found</p>
@@ -106,48 +150,57 @@ export function UserManagerClient({ initialUsers }: { initialUsers: KhojUser[] }
                   </td>
                 </tr>
               ) : (
-                filtered.map((user) => (
-                  <tr key={user.id} className="hover:bg-neutral-50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-neutral-900">{user.name}</td>
-                    <td className="px-6 py-4">{user.email}</td>
-                    <td className="px-6 py-4 capitalize">{user.role}</td>
-                    <td className="px-6 py-4">
-                      {user.verified ? (
-                        <span className="inline-flex items-center gap-1 text-success-600 text-xs font-medium">
-                          <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                          Verified
+                filtered.map((user) => {
+                  const isSelf = currentUser?.id === user.id;
+                  return (
+                    <tr key={user.id} className="hover:bg-neutral-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-neutral-900">{user.name}</td>
+                      <td className="px-6 py-4">{user.email}</td>
+                      <td className="px-6 py-4 capitalize">{user.role}</td>
+                      <td className="px-6 py-4">
+                        {user.verified ? (
+                          <span className="inline-flex items-center gap-1 text-success-600 text-xs font-medium">
+                            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+                            Verified
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-neutral-400 text-xs">
+                            <ShieldOff className="w-3.5 h-3.5" aria-hidden="true" />
+                            Unverified
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-neutral-500">
+                        {new Date(user.joinedDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                          user.status === "active"
+                            ? "bg-success-50 text-success-700"
+                            : "bg-error-50 text-error-700"
+                        }`}>
+                          {user.status === "active" ? "Active" : "Suspended"}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-neutral-400 text-xs">
-                          <ShieldOff className="w-3.5 h-3.5" aria-hidden="true" />
-                          Unverified
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-neutral-500">
-                      {new Date(user.joinedDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        user.status === "active"
-                          ? "bg-success-50 text-success-700"
-                          : "bg-error-50 text-error-700"
-                      }`}>
-                        {user.status === "active" ? "Active" : "Suspended"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button
-                        size="sm"
-                        variant={user.status === "active" ? "destructive" : "secondary"}
-                        onClick={() => setConfirmUser(user)}
-                        aria-label={user.status === "active" ? `Suspend ${user.name}` : `Reactivate ${user.name}`}
-                      >
-                        {user.status === "active" ? "Suspend" : "Reactivate"}
-                      </Button>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {isSelf ? (
+                          <span className="text-xs text-neutral-400 font-medium px-2 py-1 bg-neutral-100 rounded">
+                            You (Admin)
+                          </span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant={user.status === "active" ? "destructive" : "secondary"}
+                            onClick={() => setConfirmUser(user)}
+                            aria-label={user.status === "active" ? `Suspend ${user.name}` : `Reactivate ${user.name}`}
+                          >
+                            {user.status === "active" ? "Suspend" : "Reactivate"}
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

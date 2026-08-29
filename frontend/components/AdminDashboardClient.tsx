@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { KhojEvent } from "@/lib/types";
-import { approveEvent, rejectEvent } from "@/lib/mockApi";
+import { approveEvent, rejectEvent, getAllEventsForAdmin } from "@/lib/eventsApi";
 import { Card } from "@/components/ui/Card";
 import { StatusChip, CategoryTag } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -11,13 +11,43 @@ import { Modal } from "@/components/ui/Modal";
 import { Textarea } from "@/components/ui/Input";
 import { Check, X, Eye } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
-export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEvent[] }) {
+export function AdminDashboardClient({ initialEvents = [] }: { initialEvents?: KhojEvent[] }) {
   const router = useRouter();
-  const [events, setEvents] = useState(initialEvents);
+  const { token, isLoading: authLoading } = useAuth();
+  const [events, setEvents] = useState<KhojEvent[]>(initialEvents);
+  const [loading, setLoading] = useState(!initialEvents.length);
+  const [error, setError] = useState<string | null>(null);
   const [rejectingEvent, setRejectingEvent] = useState<KhojEvent | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const fetchEvents = useCallback(async () => {
+    if (!token) return;
+    try {
+      setLoading(true);
+      const data = await getAllEventsForAdmin(token);
+      setEvents(data);
+      setError(null);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to fetch admin events");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchEvents();
+    } else if (!authLoading && !token) {
+      setLoading(false);
+    }
+  }, [token, authLoading, fetchEvents]);
 
   // Group events
   const pending = events.filter(e => e.status === "pending");
@@ -26,25 +56,35 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
 
   const handleApprove = async (id: string) => {
     setIsProcessing(true);
-    const updated = await approveEvent(id);
-    if (updated) {
-      setEvents(prev => prev.map(e => e.id === id ? updated : e));
-      router.refresh();
+    try {
+      const updated = await approveEvent(id, token);
+      if (updated) {
+        setEvents(prev => prev.map(e => e.id === id ? updated : e));
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to approve event");
+    } finally {
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
   };
 
   const handleRejectSubmit = async () => {
     if (!rejectingEvent || !rejectionReason.trim()) return;
     setIsProcessing(true);
-    const updated = await rejectEvent(rejectingEvent.id, rejectionReason);
-    if (updated) {
-      setEvents(prev => prev.map(e => e.id === rejectingEvent.id ? updated : e));
-      router.refresh();
+    try {
+      const updated = await rejectEvent(rejectingEvent.id, rejectionReason, token);
+      if (updated) {
+        setEvents(prev => prev.map(e => e.id === rejectingEvent.id ? updated : e));
+        router.refresh();
+      }
+      setRejectingEvent(null);
+      setRejectionReason("");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to reject event");
+    } finally {
+      setIsProcessing(false);
     }
-    setRejectingEvent(null);
-    setRejectionReason("");
-    setIsProcessing(false);
   };
 
   const EventRow = ({ event }: { event: KhojEvent }) => (
@@ -102,6 +142,12 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
         <p className="text-neutral-600">Review and manage platform events.</p>
       </div>
 
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-error-50 border border-error-200 text-error-700 text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6">
           <p className="text-sm font-medium text-neutral-500 mb-1">Pending Review</p>
@@ -138,7 +184,13 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-200 bg-white">
-                  {pending.length === 0 ? (
+                  {loading ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-12 text-center text-sm text-neutral-500">
+                        Loading pending events...
+                      </td>
+                    </tr>
+                  ) : pending.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-12 text-center">
                         <p className="text-lg font-medium text-neutral-900 mb-1">All caught up!</p>
@@ -154,7 +206,7 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
           </Card>
         </section>
 
-        {/* Actioned Events Tables (simplified) */}
+        {/* Actioned Events Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <section>
             <h2 className="text-lg font-bold text-neutral-900 mb-4">Recently Approved</h2>
@@ -162,7 +214,9 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-neutral-600">
                   <tbody className="divide-y divide-neutral-200 bg-white">
-                    {approved.length === 0 ? (
+                    {loading ? (
+                      <tr><td className="px-6 py-8 text-center text-sm text-neutral-400">Loading approved events...</td></tr>
+                    ) : approved.length === 0 ? (
                       <tr><td className="px-6 py-8 text-center text-sm text-neutral-400">No approved events yet.</td></tr>
                     ) : (
                       approved.slice(0, 5).map(event => <EventRow key={event.id} event={event} />)
@@ -179,7 +233,9 @@ export function AdminDashboardClient({ initialEvents }: { initialEvents: KhojEve
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-neutral-600">
                   <tbody className="divide-y divide-neutral-200 bg-white">
-                    {rejected.length === 0 ? (
+                    {loading ? (
+                      <tr><td className="px-6 py-8 text-center text-sm text-neutral-400">Loading rejected events...</td></tr>
+                    ) : rejected.length === 0 ? (
                       <tr><td className="px-6 py-8 text-center text-sm text-neutral-400">No rejected events.</td></tr>
                     ) : (
                       rejected.slice(0, 5).map(event => <EventRow key={event.id} event={event} />)

@@ -1,13 +1,48 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { KhojEvent } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { StatusChip, CategoryTag, DeadlineBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Plus, Edit2, Eye } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { getEventsByOrganizer } from "@/lib/eventsApi";
 
-export function OrganizerDashboardClient({ events, organizerName }: { events: KhojEvent[], organizerName: string }) {
+export function OrganizerDashboardClient({
+  initialEvents = [],
+  organizerName: initialName = "",
+}: {
+  initialEvents?: KhojEvent[];
+  organizerName?: string;
+}) {
+  const { user, token, isLoading: authLoading } = useAuth();
+  const [events, setEvents] = useState<KhojEvent[]>(initialEvents);
+  const [loading, setLoading] = useState(!initialEvents.length);
+  const [error, setError] = useState<string | null>(null);
+
+  const organizerName = user?.name || initialName || "Organizer";
+
+  useEffect(() => {
+    if (token) {
+      setLoading(true);
+      getEventsByOrganizer(token)
+        .then((data) => {
+          setEvents(data);
+          setError(null);
+        })
+        .catch((err) => {
+          setError(err.message || "Failed to load events");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else if (!authLoading && !token) {
+      setLoading(false);
+    }
+  }, [token, authLoading]);
+
   return (
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -22,6 +57,12 @@ export function OrganizerDashboardClient({ events, organizerName }: { events: Kh
           </Button>
         </Link>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-error-50 border border-error-200 text-error-700 text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6">
@@ -55,7 +96,13 @@ export function OrganizerDashboardClient({ events, organizerName }: { events: Kh
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200 bg-white">
-              {events.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-14 text-center">
+                    <p className="text-sm text-neutral-500">Loading events...</p>
+                  </td>
+                </tr>
+              ) : events.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-14 text-center">
                     <p className="text-lg font-medium text-neutral-900 mb-1">No events yet</p>

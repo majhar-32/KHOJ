@@ -1,4 +1,4 @@
-import { getEvents, getCategories } from "@/lib/mockApi";
+import { getEvents, getCategories } from "@/lib/eventsApi";
 import { BrowseEventsClient } from "@/components/BrowseEventsClient";
 
 import { Suspense } from "react";
@@ -6,10 +6,17 @@ import { Suspense } from "react";
 export const dynamic = 'force-dynamic';
 
 export default async function BrowseEventsPage() {
-  const [events, categories] = await Promise.all([
-    getEvents(),
-    getCategories()
-  ]);
+  let events: any[] = [];
+  let categories: string[] = [];
+
+  try {
+    [events, categories] = await Promise.all([
+      getEvents(),
+      getCategories()
+    ]);
+  } catch (error) {
+    console.error("Failed to load browse events data:", error);
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50">

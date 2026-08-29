@@ -9,6 +9,8 @@ import { Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { AISearchBar } from "@/components/AISearchBar";
 import { simulateAISearch } from "@/lib/mockApi";
+import { getSavedEvents } from "@/lib/eventsApi";
+import { useAuth } from "@/context/AuthContext";
 
 interface BrowseEventsClientProps {
   initialEvents: KhojEvent[];
@@ -18,6 +20,8 @@ interface BrowseEventsClientProps {
 export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { token, isAuthenticated } = useAuth();
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   
   const initialQ = searchParams.get("q") || "";
   
@@ -67,6 +71,31 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     const params = new URLSearchParams(searchParams.toString());
     params.set("q", query);
     router.replace(`/events?${params.toString()}`);
+  };
+
+  // Fetch user's saved events if logged in
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      getSavedEvents(token)
+        .then((savedEvents) => {
+          setSavedIds(new Set(savedEvents.map((e) => e.id)));
+        })
+        .catch(() => {});
+    } else {
+      setSavedIds(new Set());
+    }
+  }, [isAuthenticated, token]);
+
+  const handleToggleSave = (eventId: string, saved: boolean) => {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (saved) {
+        next.add(eventId);
+      } else {
+        next.delete(eventId);
+      }
+      return next;
+    });
   };
 
   // Handle URL search on mount
@@ -245,7 +274,12 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
       ) : filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard
+              key={event.id}
+              event={event}
+              isSaved={savedIds.has(event.id)}
+              onToggleSave={handleToggleSave}
+            />
           ))}
         </div>
       ) : (

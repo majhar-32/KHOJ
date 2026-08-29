@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useRole } from "@/context/RoleContext";
-import { Role } from "@/lib/types";
+import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -11,17 +10,36 @@ import Link from "next/link";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { setRole } = useRole();
-  const [selectedRole, setSelectedRole] = useState<Role>("user");
+  const { signup } = useAuth();
+  const [selectedRole, setSelectedRole] = useState<"USER" | "ORGANIZER">("USER");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Temporary stand-in for real auth: set dev role and redirect
-    setRole(selectedRole);
-    router.push("/");
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await signup({
+        name,
+        email,
+        password,
+        role: selectedRole,
+      });
+      router.push("/");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to create account");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -40,14 +58,20 @@ export default function SignUpPage() {
         </div>
 
         <Card className="p-6 sm:p-8">
+          {error && (
+            <div className="mb-4 p-3 text-sm text-error-700 bg-error-50 border border-error-200 rounded-lg">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Segmented Control for Role */}
             <div className="flex p-1 bg-neutral-100 rounded-lg">
               <button
                 type="button"
-                onClick={() => setSelectedRole("user")}
+                onClick={() => setSelectedRole("USER")}
                 className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                  selectedRole === "user"
+                  selectedRole === "USER"
                     ? "bg-white text-neutral-900 shadow-sm"
                     : "text-neutral-500 hover:text-neutral-700"
                 }`}
@@ -56,9 +80,9 @@ export default function SignUpPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setSelectedRole("organizer")}
+                onClick={() => setSelectedRole("ORGANIZER")}
                 className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                  selectedRole === "organizer"
+                  selectedRole === "ORGANIZER"
                     ? "bg-white text-neutral-900 shadow-sm"
                     : "text-neutral-500 hover:text-neutral-700"
                 }`}
@@ -70,12 +94,12 @@ export default function SignUpPage() {
             <div className="space-y-4">
               <Input
                 id="name"
-                label={selectedRole === "organizer" ? "Organization Name" : "Full Name"}
+                label={selectedRole === "ORGANIZER" ? "Organization Name" : "Full Name"}
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={selectedRole === "organizer" ? "e.g. DU IT Society" : "e.g. John Doe"}
+                placeholder={selectedRole === "ORGANIZER" ? "e.g. DU IT Society" : "e.g. John Doe"}
               />
               <Input
                 id="email"
@@ -97,8 +121,8 @@ export default function SignUpPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creating account..." : "Create Account"}
             </Button>
           </form>
         </Card>

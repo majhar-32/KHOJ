@@ -1,12 +1,21 @@
-import { getCategories, getEvents } from "@/lib/mockApi";
-import { EventCard } from "@/components/EventCard";
+import { getCategories, getEvents } from "@/lib/eventsApi";
+import { HomeClosingSoonClient } from "@/components/HomeClosingSoonClient";
 import { AISearchBar } from "@/components/AISearchBar";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
-  const [events, categories] = await Promise.all([
-    getEvents(),
-    getCategories(),
-  ]);
+  let events: any[] = [];
+  let categories: string[] = [];
+
+  try {
+    [events, categories] = await Promise.all([
+      getEvents(),
+      getCategories(),
+    ]);
+  } catch (error) {
+    console.error("Failed to load home page data:", error);
+  }
 
   // Sort by nearest deadline, keeping only those in the future (or all, if we want to show closing soon)
   const now = new Date().getTime();
@@ -55,11 +64,7 @@ export default async function Home() {
           <h2 className="text-2xl font-bold text-neutral-900">Closing Soon</h2>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {closingSoon.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
+        <HomeClosingSoonClient events={closingSoon} />
       </section>
     </div>
   );

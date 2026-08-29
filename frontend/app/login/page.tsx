@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useRole } from "@/context/RoleContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -10,15 +10,29 @@ import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setRole } = useRole();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Temporary stand-in for real auth: set dev role (default to user for login if not known) and redirect
-    setRole("user"); // For now, just logging in as user, can be changed via nav switcher
-    router.push("/");
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await login({ email, password });
+      router.push("/");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Invalid email or password");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -37,6 +51,12 @@ export default function LoginPage() {
         </div>
 
         <Card className="p-6 sm:p-8">
+          {error && (
+            <div className="mb-4 p-3 text-sm text-error-700 bg-error-50 border border-error-200 rounded-lg">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <Input
@@ -59,8 +79,8 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full">
-              Log In
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Log In"}
             </Button>
           </form>
         </Card>

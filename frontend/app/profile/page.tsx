@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useRole } from "@/context/RoleContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -10,14 +10,19 @@ import { User, Lock, LogOut } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { setRole } = useRole();
-  const [name, setName] = useState("Demo User");
+  const { user, logout } = useAuth();
+  const [name, setName] = useState(user?.name || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  useEffect(() => {
+    if (user?.name) {
+      setName(user.name);
+    }
+  }, [user]);
+
   const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    // No-op for now
     alert("Profile updated!");
   };
 
@@ -27,15 +32,13 @@ export default function ProfilePage() {
       alert("Passwords do not match");
       return;
     }
-    // No-op for now
     setNewPassword("");
     setConfirmPassword("");
     alert("Password changed successfully! (Simulated)");
   };
 
   const handleLogout = () => {
-    // Reset to user role as a mock logout, then redirect
-    setRole("user");
+    logout();
     router.push("/");
   };
 
@@ -67,7 +70,7 @@ export default function ProfilePage() {
               id="email"
               label="Email address"
               type="email"
-              value="user@example.com"
+              value={user?.email || "Not signed in"}
               disabled
               readOnly
             />
