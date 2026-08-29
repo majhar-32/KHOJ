@@ -37,25 +37,27 @@ export async function getEventById(id: string): Promise<KhojEvent | undefined> {
 }
 
 export async function createEvent(
-  eventData: Omit<KhojEvent, "id" | "status" | "saved">,
+  eventData: FormData | Omit<KhojEvent, "id" | "status" | "saved">,
   token?: string | null
 ): Promise<KhojEvent> {
+  const isForm = typeof FormData !== "undefined" && eventData instanceof FormData;
   return apiRequest<KhojEvent>("/events", {
     method: "POST",
     token,
-    body: JSON.stringify(eventData),
+    body: isForm ? eventData : JSON.stringify(eventData),
   });
 }
 
 export async function updateEvent(
   id: string,
-  eventData: Partial<KhojEvent>,
+  eventData: FormData | Partial<KhojEvent>,
   token?: string | null
 ): Promise<KhojEvent | undefined> {
+  const isForm = typeof FormData !== "undefined" && eventData instanceof FormData;
   return apiRequest<KhojEvent>(`/events/${id}`, {
     method: "PUT",
     token,
-    body: JSON.stringify(eventData),
+    body: isForm ? eventData : JSON.stringify(eventData),
   });
 }
 

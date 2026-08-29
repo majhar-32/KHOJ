@@ -75,7 +75,24 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
   return (
     <div className="min-h-screen bg-neutral-50 pb-24">
       {/* Hero Banner */}
-      <div className={`w-full h-48 md:h-64 ${bannerToneClasses[event.bannerColor] || bannerToneClasses.default}`} />
+      <div
+        className={`w-full h-48 md:h-72 relative overflow-hidden ${
+          !event.bannerImageUrl
+            ? bannerToneClasses[event.bannerColor] || bannerToneClasses.default
+            : "bg-neutral-950"
+        }`}
+      >
+        {event.bannerImageUrl && (
+          <>
+            <img
+              src={event.bannerImageUrl}
+              alt={event.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-neutral-950/20 to-neutral-950/30" />
+          </>
+        )}
+      </div>
 
       <div className="max-w-[1024px] mx-auto px-4 sm:px-6 -mt-16 md:-mt-24 relative z-10">
         <Card className="p-6 sm:p-8 shadow-sm mb-8">

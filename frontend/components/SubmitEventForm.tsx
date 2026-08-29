@@ -95,31 +95,62 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
     }
   };
 
+  // Banner upload state
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(initialData?.bannerImageUrl || null);
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBannerFile(file);
+      setBannerPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveBanner = () => {
+    setBannerFile(null);
+    setBannerPreview(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setFormError(null);
 
     try {
-      const payload = {
-        ...formData,
-        city: formData.mode === "online" && !formData.city ? "Online" : formData.city || "Online",
-        venue: formData.mode === "online" && !formData.venue ? "Online" : formData.venue || "Online",
-        prizePool: formData.prizePool || "N/A",
-        certificateInfo: formData.certificateInfo || "N/A",
-        rules: formData.rules || "N/A",
-        officialWebsite: formData.officialWebsite || "",
-        availableSeats: formData.availableSeats ? parseInt(formData.availableSeats, 10) : null,
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("eventDate", formData.eventDate);
+      formDataToSend.append("eventTime", formData.eventTime);
+      formDataToSend.append("mode", formData.mode);
+      formDataToSend.append("city", formData.mode === "online" && !formData.city ? "Online" : formData.city || "Online");
+      formDataToSend.append("venue", formData.mode === "online" && !formData.venue ? "Online" : formData.venue || "Online");
+      formDataToSend.append("registrationDeadline", formData.registrationDeadline);
+      formDataToSend.append("registrationFee", formData.registrationFee);
+      formDataToSend.append("prizePool", formData.prizePool || "N/A");
+      formDataToSend.append("eligibility", formData.eligibility);
+      formDataToSend.append("teamSize", formData.teamSize);
+      formDataToSend.append("certificateInfo", formData.certificateInfo || "N/A");
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("rules", formData.rules || "N/A");
+      formDataToSend.append("contactInfo", formData.contactInfo);
+      formDataToSend.append("registrationLink", formData.registrationLink);
+      formDataToSend.append("officialWebsite", formData.officialWebsite || "");
+      formDataToSend.append("bannerColor", formData.bannerColor || "primary");
+
+      if (formData.availableSeats) {
+        formDataToSend.append("availableSeats", formData.availableSeats);
+      }
+
+      if (bannerFile) {
+        formDataToSend.append("banner", bannerFile);
+      }
 
       if (mode === "edit" && initialData) {
-        await updateEvent(initialData.id, payload, token);
+        await updateEvent(initialData.id, formDataToSend, token);
       } else {
-        await createEvent({
-          ...payload,
-          organizerName: user?.name || "Organizer",
-          organizerVerified: false,
-        }, token);
+        await createEvent(formDataToSend, token);
       }
       router.push("/dashboard/organizer");
     } catch (error: unknown) {
@@ -221,13 +252,44 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
               <Select id="category" label={renderLabel("Category", "category")} required value={formData.category} onChange={handleChange}>
                 {categories.map(c => <option key={c} value={c}>{c}</option>)}
               </Select>
-              <Select id="bannerColor" label={renderLabel("Banner Theme", "bannerColor")} value={formData.bannerColor} onChange={handleChange}>
+              <Select id="bannerColor" label={renderLabel("Banner Fallback Theme", "bannerColor")} value={formData.bannerColor} onChange={handleChange}>
                 <option value="primary">Blue (Primary)</option>
                 <option value="success">Green (Success)</option>
                 <option value="warning">Amber (Warning)</option>
                 <option value="error">Red (Error)</option>
               </Select>
             </div>
+
+            {/* Banner Image Upload */}
+            <div>
+              <label htmlFor="banner-upload" className="block text-sm font-medium text-neutral-700 mb-1">
+                Banner Image (Optional — JPG, PNG, WebP up to 5MB)
+              </label>
+              <input
+                id="banner-upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/jpg"
+                onChange={handleBannerChange}
+                className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+              />
+              {bannerPreview && (
+                <div className="mt-3 relative rounded-xl overflow-hidden border border-neutral-200 aspect-[16/9] max-h-48 bg-neutral-100 flex items-center justify-center">
+                  <img
+                    src={bannerPreview}
+                    alt="Banner preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveBanner}
+                    className="absolute top-2 right-2 bg-neutral-900/70 hover:bg-neutral-900 text-white rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
             <Textarea id="description" label={renderLabel("Description", "description")} required value={formData.description} onChange={handleChange} placeholder="Tell us about the event..." />
           </div>
         </Card>

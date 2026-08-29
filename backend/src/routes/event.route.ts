@@ -15,6 +15,7 @@ import {
 } from '../controllers/savedEvent.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
+import { uploadBanner } from '../middleware/upload';
 import { Role } from '@prisma/client';
 
 const router = Router();
@@ -30,14 +31,14 @@ router.get('/saved', authenticate, getSavedEvents);
 // Event by ID
 router.get('/:id', getEventById);
 
-// Create event
-router.post('/', authenticate, authorize(Role.ORGANIZER), createEvent);
+// Create event (with optional banner upload)
+router.post('/', authenticate, authorize(Role.ORGANIZER), uploadBanner, createEvent);
 
 // Save / Bookmark toggle
 router.post('/:id/save', authenticate, toggleSaveEvent);
 
-// Update event
-router.put('/:id', authenticate, authorize(Role.ORGANIZER, Role.ADMIN), updateEvent);
+// Update event (with optional banner upload)
+router.put('/:id', authenticate, authorize(Role.ORGANIZER, Role.ADMIN), uploadBanner, updateEvent);
 
 // Admin approval & rejection
 router.post('/:id/approve', authenticate, authorize(Role.ADMIN), approveEvent);
