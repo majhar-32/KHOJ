@@ -4,12 +4,11 @@ import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { KhojEvent } from "@/lib/types";
 import { EventCard } from "@/components/EventCard";
-import { FilterX, X } from "lucide-react";
+import { FilterX, X, Sparkles } from "lucide-react";
 import { Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { AISearchBar } from "@/components/AISearchBar";
-import { simulateAISearch } from "@/lib/mockApi";
-import { getSavedEvents } from "@/lib/eventsApi";
+import { getSavedEvents, searchEvents } from "@/lib/eventsApi";
 import { useAuth } from "@/context/AuthContext";
 
 interface BrowseEventsClientProps {
@@ -31,14 +30,8 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
   const [selectedCity, setSelectedCity] = useState("all");
   const [deadlineBefore, setDeadlineBefore] = useState<string | null>(null);
 
-  // AI parsed filters display state
-  const [aiFilters, setAiFilters] = useState<{
-    category?: string;
-    city?: string;
-    mode?: "online" | "offline";
-    deadlineBefore?: string;
-  }>({});
-  const [hasAIFilters, setHasAIFilters] = useState(false);
+  // Real AI search results
+  const [aiSearchResults, setAiSearchResults] = useState<KhojEvent[] | null>(null);
   const [aiSearchDone, setAiSearchDone] = useState(false);
   const [isInitializing, setIsInitializing] = useState(!!initialQ);
 
@@ -48,24 +41,22 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     return uniqueCities.sort();
   }, [initialEvents]);
 
-
-
-  const handleAISearch = async (query: string) => {
-    if (!query) return;
+  const handleAISearch = async (query: string, directResults?: KhojEvent[]) => {
+    if (!query.trim()) return;
     
     setSearchQuery(query);
-    const parsed = await simulateAISearch(query);
-    
-    // Update manual filter states so they stay in sync
-    if (parsed.category) setSelectedCategory(parsed.category);
-    if (parsed.city) setSelectedCity(parsed.city);
-    if (parsed.mode) setSelectedMode(parsed.mode);
-    if (parsed.deadlineBefore) setDeadlineBefore(parsed.deadlineBefore);
-    
-    setAiFilters(parsed);
-    setHasAIFilters(Object.keys(parsed).length > 0);
-    setAiSearchDone(true);
-    setIsInitializing(false);
+    setIsInitializing(true);
+
+    try {
+      const results = directResults || (await searchEvents(query));
+      setAiSearchResults(results);
+      setAiSearchDone(true);
+    } catch {
+      setAiSearchResults(null);
+      setAiSearchDone(true);
+    } finally {
+      setIsInitializing(false);
+    }
 
     // Update URL without triggering a full reload
     const params = new URLSearchParams(searchParams.toString());
@@ -101,29 +92,15 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
   // Handle URL search on mount
   useEffect(() => {
     if (initialQ) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleAISearch(initialQ);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const removeAIFilter = (key: keyof typeof aiFilters) => {
-    setAiFilters(prev => {
-      const next = { ...prev };
-      delete next[key];
-      setHasAIFilters(Object.keys(next).length > 0);
-      return next;
-    });
-
-    if (key === "category") setSelectedCategory("all");
-    if (key === "city") setSelectedCity("all");
-    if (key === "mode") setSelectedMode("all");
-    if (key === "deadlineBefore") setDeadlineBefore(null);
-  };
-
   const filteredEvents = useMemo(() => {
-    return initialEvents.filter((event) => {
+    const baseList = aiSearchResults !== null ? aiSearchResults : initialEvents;
+    return baseList.filter((event) => {
       const matchesSearch = 
+        aiSearchResults !== null ||
         !searchQuery ||
         event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.organizerName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -139,7 +116,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
 
       return matchesSearch && matchesCategory && matchesMode && matchesCity && matchesDeadline;
     });
-  }, [initialEvents, searchQuery, selectedCategory, selectedMode, selectedCity, deadlineBefore]);
+  }, [initialEvents, aiSearchResults, searchQuery, selectedCategory, selectedMode, selectedCity, deadlineBefore]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -147,15 +124,14 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     setSelectedMode("all");
     setSelectedCity("all");
     setDeadlineBefore(null);
-    setAiFilters({});
-    setHasAIFilters(false);
+    setAiSearchResults(null);
     setAiSearchDone(false);
     
     // Clear URL query
     router.replace('/events');
   };
 
-  const hasActiveFilters = searchQuery !== "" || selectedCategory !== "all" || selectedMode !== "all" || selectedCity !== "all" || !!deadlineBefore;
+  const hasActiveFilters = searchQuery !== "" || selectedCategory !== "all" || selectedMode !== "all" || selectedCity !== "all" || !!deadlineBefore || aiSearchResults !== null;
 
   return (
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
@@ -180,8 +156,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
-              // If manual override, unmark AI chip
-              if (aiFilters.category) removeAIFilter("category");
+              setAiSearchResults(null);
             }}
             className="w-full sm:w-40"
           >
@@ -195,7 +170,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
             value={selectedMode}
             onChange={(e) => {
               setSelectedMode(e.target.value);
-              if (aiFilters.mode) removeAIFilter("mode");
+              setAiSearchResults(null);
             }}
             className="w-full sm:w-32"
           >
@@ -208,7 +183,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
             value={selectedCity}
             onChange={(e) => {
               setSelectedCity(e.target.value);
-              if (aiFilters.city) removeAIFilter("city");
+              setAiSearchResults(null);
             }}
             className="w-full sm:w-36"
             disabled={selectedMode === "online"}
@@ -228,41 +203,21 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
         </div>
       </div>
 
-      {/* AI Parsed Chips */}
-      {aiSearchDone && (
-        <div className="mb-8 p-3 rounded-lg bg-primary-50 border border-primary-100 flex flex-wrap items-center gap-3">
-          <span className="text-sm text-primary-900 font-medium">AI understood your search as:</span>
-          
-          {hasAIFilters ? (
-            <div className="flex flex-wrap gap-2">
-              {aiFilters.category && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
-                  Category: {aiFilters.category}
-                  <button aria-label="Remove category filter" onClick={() => removeAIFilter("category")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
-                </span>
-              )}
-              {aiFilters.city && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
-                  City: {aiFilters.city}
-                  <button aria-label="Remove city filter" onClick={() => removeAIFilter("city")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
-                </span>
-              )}
-              {aiFilters.mode && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
-                  Mode: {aiFilters.mode}
-                  <button aria-label="Remove mode filter" onClick={() => removeAIFilter("mode")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
-                </span>
-              )}
-              {aiFilters.deadlineBefore && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-primary-700 shadow-sm border border-primary-200">
-                  Deadline before: {aiFilters.deadlineBefore}
-                  <button aria-label="Remove deadline filter" onClick={() => removeAIFilter("deadlineBefore")} className="text-primary-400 hover:text-primary-600"><X className="w-3 h-3" aria-hidden="true" /></button>
-                </span>
-              )}
-            </div>
-          ) : (
-            <span className="text-sm text-neutral-600">No specific filters detected &mdash; showing keyword matches for &apos;{searchQuery}&apos;.</span>
-          )}
+      {/* AI Search Indicator */}
+      {aiSearchDone && searchQuery && (
+        <div className="mb-8 p-3 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary-600" aria-hidden="true" />
+            <span className="text-sm text-primary-900 font-medium">
+              AI search results for &ldquo;{searchQuery}&rdquo; ({filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} found)
+            </span>
+          </div>
+          <button
+            onClick={clearFilters}
+            className="text-xs text-primary-600 hover:text-primary-800 font-medium underline"
+          >
+            Reset search
+          </button>
         </div>
       )}
 

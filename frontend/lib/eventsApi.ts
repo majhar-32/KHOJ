@@ -100,3 +100,39 @@ export async function toggleSaveEvent(
 export async function getCategories(): Promise<string[]> {
   return apiRequest<string[]>("/categories");
 }
+
+export interface ExtractedEventData {
+  name?: string | null;
+  category?: string | null;
+  eventDate?: string | null;
+  eventTime?: string | null;
+  venue?: string | null;
+  city?: string | null;
+  mode?: "online" | "offline" | null;
+  registrationDeadline?: string | null;
+  registrationFee?: string | null;
+  prizePool?: string | null;
+  eligibility?: string | null;
+  teamSize?: string | null;
+  description?: string | null;
+}
+
+export async function extractEvent(
+  rawText: string,
+  token?: string | null
+): Promise<ExtractedEventData> {
+  return apiRequest<ExtractedEventData>("/ai/extract-event", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ rawText }),
+  });
+}
+
+export async function searchEvents(
+  query: string
+): Promise<KhojEvent[]> {
+  return apiRequest<KhojEvent[]>("/ai/search", {
+    method: "POST",
+    body: JSON.stringify({ query }),
+  });
+}

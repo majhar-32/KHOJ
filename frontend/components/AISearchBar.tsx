@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Sparkles } from "lucide-react";
-import { simulateAISearch } from "@/lib/mockApi";
+import { searchEvents } from "@/lib/eventsApi";
+import { KhojEvent } from "@/lib/types";
 
 interface AISearchBarProps {
   initialValue?: string;
   placeholder?: string;
   className?: string;
   inputClassName?: string;
-  onSearch?: (query: string, parsedFilters: { category?: string; city?: string; mode?: "online" | "offline"; deadlineBefore?: string }) => void;
+  onSearch?: (query: string, results?: KhojEvent[]) => void;
 }
 
 export function AISearchBar({ 
@@ -31,16 +32,16 @@ export function AISearchBar({
     setIsSearching(true);
     
     try {
-      const parsedFilters = await simulateAISearch(query);
-      
       if (onSearch) {
-        // If controlled by parent (like BrowseEventsClient)
-        onSearch(query, parsedFilters);
+        const results = await searchEvents(query);
+        onSearch(query, results);
       } else {
-        // If independent (like Landing Page)
-        // We navigate to /events with the query. The Browse page will parse it again.
-        // It's a bit redundant to parse twice, but it satisfies the requirement of 
-        // showing the loading state on the landing page before navigating.
+        router.push(`/events?q=${encodeURIComponent(query)}`);
+      }
+    } catch {
+      if (onSearch) {
+        onSearch(query);
+      } else {
         router.push(`/events?q=${encodeURIComponent(query)}`);
       }
     } finally {
