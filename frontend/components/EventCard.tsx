@@ -77,13 +77,26 @@ export function EventCard({
           padded={false}
           className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow group"
         >
-          {/* Mock Banner */}
+          {/* Banner Container */}
           <div
-            className={`h-32 w-full shrink-0 relative p-4 flex flex-col justify-between ${
-              bannerToneClasses[event.bannerColor] || bannerToneClasses.default
+            className={`h-32 w-full shrink-0 relative p-4 flex flex-col justify-between overflow-hidden ${
+              !event.bannerImageUrl
+                ? bannerToneClasses[event.bannerColor] || bannerToneClasses.default
+                : "bg-neutral-900"
             }`}
           >
-            <div className="flex justify-between items-start gap-2">
+            {event.bannerImageUrl && (
+              <>
+                <img
+                  src={event.bannerImageUrl}
+                  alt={event.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-neutral-950/20 to-neutral-950/40" />
+              </>
+            )}
+
+            <div className="relative z-10 flex justify-between items-start gap-2">
               <CategoryTag label={event.category} />
               <div className="flex items-center gap-1">
                 {showStatus && <StatusChip status={event.status} />}
@@ -98,18 +111,18 @@ export function EventCard({
                     className="h-8 w-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
                   >
                     <Bookmark
-                      className={`w-4 h-4 transition-colors ${
+                      className={`h-4 w-4 ${
                         saved
                           ? "fill-primary-600 text-primary-600"
-                          : "text-neutral-500"
+                          : "text-neutral-600"
                       }`}
-                      aria-hidden="true"
                     />
                   </button>
                 )}
               </div>
             </div>
-            <div className="bg-white/90 backdrop-blur-sm rounded-md px-2 py-1 self-start shadow-sm">
+
+            <div className="relative z-10 self-start">
               <DeadlineBadge daysLeft={daysLeft} />
             </div>
           </div>

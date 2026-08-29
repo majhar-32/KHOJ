@@ -27,7 +27,8 @@ export interface KhojEvent {
   contactInfo: string;
   registrationLink: string;
   officialWebsite: string;
-  bannerColor: string; // placeholder banner background (mock, no real images yet)
+  bannerColor: string; // placeholder banner background (fallback when bannerImageUrl is null)
+  bannerImageUrl?: string | null;
   status: EventStatus;
   rejectionReason?: string;
   saved?: boolean;

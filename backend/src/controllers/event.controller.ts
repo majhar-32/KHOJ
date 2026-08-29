@@ -51,7 +51,11 @@ const createEventSchema = z.object({
   prizePool: z.string().min(1, 'Prize pool is required'),
   eligibility: z.string().min(1, 'Eligibility is required'),
   teamSize: z.string().min(1, 'Team size is required'),
-  availableSeats: z.number().nullable().optional(),
+  availableSeats: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined || val === 'null' || val === 'undefined') return null;
+    const num = Number(val);
+    return isNaN(num) ? val : num;
+  }, z.number().nullable().optional()),
   certificateInfo: z.string().min(1, 'Certificate info is required'),
   description: z.string().min(1, 'Description is required'),
   rules: z.string().min(1, 'Rules are required'),
@@ -208,6 +212,8 @@ export const createEvent = async (
       return;
     }
 
+    const bannerImageUrl = req.file ? (req.file as any).path : null;
+
     const created = await prisma.event.create({
       data: {
         name: data.name,
@@ -230,7 +236,7 @@ export const createEvent = async (
         contactInfo: data.contactInfo,
         registrationLink: data.registrationLink,
         officialWebsite: data.officialWebsite || '',
-        bannerImageUrl: null,
+        bannerImageUrl: bannerImageUrl,
         status: EventStatus.PENDING,
         rejectionReason: null,
       },
@@ -300,6 +306,10 @@ export const updateEvent = async (
     if (data.contactInfo !== undefined) updateData.contactInfo = data.contactInfo;
     if (data.registrationLink !== undefined) updateData.registrationLink = data.registrationLink;
     if (data.officialWebsite !== undefined) updateData.officialWebsite = data.officialWebsite;
+
+    if (req.file) {
+      updateData.bannerImageUrl = (req.file as any).path;
+    }
 
     if (data.category !== undefined) {
       const categoryRecord = await prisma.category.findFirst({
