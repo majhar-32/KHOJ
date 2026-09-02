@@ -2,12 +2,15 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { KhojUser } from "@/lib/types";
-import { getUsers, suspendUser, reactivateUser } from "@/lib/usersApi";
+import { getUsers, suspendUser, reactivateUser, promoteUser, demoteUser } from "@/lib/usersApi";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Search, ShieldCheck, ShieldOff } from "lucide-react";
+import { Search, ShieldCheck, ShieldOff, ShieldAlert, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { TableRowSkeleton } from "@/components/ui/Skeleton";
+
+type ModalActionType = "suspend" | "reactivate" | "promote" | "demote";
 
 export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUser[] }) {
   const { token, user: currentUser, isLoading: authLoading } = useAuth();
@@ -15,9 +18,13 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
   const [loading, setLoading] = useState(!initialUsers.length);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [filterRole, setFilterRole] = useState<"all" | "user" | "organizer">("all");
+  const [filterRole, setFilterRole] = useState<"all" | "user" | "organizer" | "admin">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "suspended">("all");
-  const [confirmUser, setConfirmUser] = useState<KhojUser | null>(null);
+  
+  const [modalState, setModalState] = useState<{
+    user: KhojUser;
+    action: ModalActionType;
+  } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const fetchUsers = useCallback(async () => {
@@ -53,19 +60,28 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
   }, [users, search, filterRole, filterStatus]);
 
   const handleConfirmAction = async () => {
-    if (!confirmUser) return;
+    if (!modalState) return;
+    const { user, action } = modalState;
     setIsProcessing(true);
     setError(null);
     try {
-      const updated = confirmUser.status === "active"
-        ? await suspendUser(confirmUser.id, token)
-        : await reactivateUser(confirmUser.id, token);
-      if (updated) {
-        setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+      let updated: KhojUser | null = null;
+      if (action === "suspend") {
+        updated = await suspendUser(user.id, token);
+      } else if (action === "reactivate") {
+        updated = await reactivateUser(user.id, token);
+      } else if (action === "promote") {
+        updated = await promoteUser(user.id, token);
+      } else if (action === "demote") {
+        updated = await demoteUser(user.id, token);
       }
-      setConfirmUser(null);
+
+      if (updated) {
+        setUsers((prev) => prev.map((u) => (u.id === updated!.id ? updated! : u)));
+      }
+      setModalState(null);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to update user status.");
+      setError(err instanceof Error ? err.message : "Failed to execute action.");
     } finally {
       setIsProcessing(false);
     }
@@ -75,7 +91,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">User Management</h1>
-        <p className="text-neutral-600">Search, filter, and manage platform users.</p>
+        <p className="text-neutral-600">Search, filter, and manage platform users and administrator permissions.</p>
       </div>
 
       {error && (
@@ -108,6 +124,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
           <option value="all">All Roles</option>
           <option value="user">User</option>
           <option value="organizer">Organizer</option>
+          <option value="admin">Admin</option>
         </select>
         <select
           aria-label="Filter by status"
@@ -132,16 +149,16 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                 <th className="px-6 py-4 font-medium">Verified</th>
                 <th className="px-6 py-4 font-medium">Joined</th>
                 <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Action</th>
+                <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 bg-white">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-neutral-400">
-                    Loading users...
-                  </td>
-                </tr>
+                <>
+                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={7} />
+                </>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
@@ -152,11 +169,24 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
               ) : (
                 filtered.map((user) => {
                   const isSelf = currentUser?.id === user.id;
+                  const isAdmin = user.role === "admin";
+
                   return (
                     <tr key={user.id} className="hover:bg-neutral-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-neutral-900">{user.name}</td>
                       <td className="px-6 py-4">{user.email}</td>
-                      <td className="px-6 py-4 capitalize">{user.role}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                          isAdmin
+                            ? "bg-purple-100 text-purple-700 border border-purple-200"
+                            : user.role === "organizer"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-neutral-100 text-neutral-700"
+                        }`}>
+                          {isAdmin && <ShieldAlert className="w-3 h-3" />}
+                          {user.role.toUpperCase()}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">
                         {user.verified ? (
                           <span className="inline-flex items-center gap-1 text-success-600 text-xs font-medium">
@@ -184,18 +214,46 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                       </td>
                       <td className="px-6 py-4 text-right">
                         {isSelf ? (
-                          <span className="text-xs text-neutral-400 font-medium px-2 py-1 bg-neutral-100 rounded">
+                          <span className="text-xs text-neutral-400 font-medium px-2.5 py-1 bg-neutral-100 rounded-md">
                             You (Admin)
                           </span>
                         ) : (
-                          <Button
-                            size="sm"
-                            variant={user.status === "active" ? "destructive" : "secondary"}
-                            onClick={() => setConfirmUser(user)}
-                            aria-label={user.status === "active" ? `Suspend ${user.name}` : `Reactivate ${user.name}`}
-                          >
-                            {user.status === "active" ? "Suspend" : "Reactivate"}
-                          </Button>
+                          <div className="flex items-center justify-end gap-2">
+                            {/* Promote / Demote Button */}
+                            {isAdmin ? (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-xs text-amber-700 hover:bg-amber-50"
+                                onClick={() => setModalState({ user, action: "demote" })}
+                                title="Demote to standard user"
+                              >
+                                <ArrowDownRight className="w-3.5 h-3.5 mr-1" />
+                                Demote
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="text-xs text-purple-700 hover:bg-purple-50 hover:border-purple-200"
+                                onClick={() => setModalState({ user, action: "promote" })}
+                                title="Promote to administrator"
+                              >
+                                <ArrowUpRight className="w-3.5 h-3.5 mr-1 text-purple-600" />
+                                Promote
+                              </Button>
+                            )}
+
+                            {/* Suspend / Reactivate Button */}
+                            <Button
+                              size="sm"
+                              variant={user.status === "active" ? "destructive" : "secondary"}
+                              onClick={() => setModalState({ user, action: user.status === "active" ? "suspend" : "reactivate" })}
+                              aria-label={user.status === "active" ? `Suspend ${user.name}` : `Reactivate ${user.name}`}
+                            >
+                              {user.status === "active" ? "Suspend" : "Reactivate"}
+                            </Button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -207,31 +265,71 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
         </div>
       </Card>
 
-      {/* Confirm Modal */}
+      {/* Confirmation Modal */}
       <Modal
-        open={!!confirmUser}
-        onClose={() => setConfirmUser(null)}
-        title={confirmUser?.status === "active" ? "Suspend User" : "Reactivate User"}
+        open={!!modalState}
+        onClose={() => setModalState(null)}
+        title={
+          modalState?.action === "promote"
+            ? "Promote to Admin"
+            : modalState?.action === "demote"
+            ? "Demote to Standard User"
+            : modalState?.action === "suspend"
+            ? "Suspend User"
+            : "Reactivate User"
+        }
         footer={
           <>
-            <Button variant="ghost" onClick={() => setConfirmUser(null)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setModalState(null)}>Cancel</Button>
             <Button
-              variant={confirmUser?.status === "active" ? "destructive" : "primary"}
+              variant={
+                modalState?.action === "suspend" || modalState?.action === "demote"
+                  ? "destructive"
+                  : "primary"
+              }
               onClick={handleConfirmAction}
               disabled={isProcessing}
             >
-              {isProcessing ? "Processing..." : confirmUser?.status === "active" ? "Suspend" : "Reactivate"}
+              {isProcessing
+                ? "Processing..."
+                : modalState?.action === "promote"
+                ? "Confirm Promotion"
+                : modalState?.action === "demote"
+                ? "Confirm Demotion"
+                : modalState?.action === "suspend"
+                ? "Suspend User"
+                : "Reactivate User"}
             </Button>
           </>
         }
       >
-        <p className="text-sm text-neutral-600">
-          {confirmUser?.status === "active"
-            ? <>Are you sure you want to suspend <strong>{confirmUser?.name}</strong>? They will no longer be able to log in or submit events.</>
-            : <>Are you sure you want to reactivate <strong>{confirmUser?.name}</strong>? They will regain full access to their account.</>
-          }
-        </p>
+        <div className="text-sm text-neutral-600 space-y-2">
+          {modalState?.action === "promote" && (
+            <p>
+              Are you sure you want to promote <strong>{modalState.user.name}</strong> ({modalState.user.email}) to an <strong>Admin</strong>? They will gain administrative privileges, including access to user management and review queues.
+            </p>
+          )}
+
+          {modalState?.action === "demote" && (
+            <p>
+              Are you sure you want to demote <strong>{modalState.user.name}</strong> ({modalState.user.email}) back to a standard user? Their admin access will be revoked immediately.
+            </p>
+          )}
+
+          {modalState?.action === "suspend" && (
+            <p>
+              Are you sure you want to suspend <strong>{modalState.user.name}</strong>? They will no longer be able to log in or submit events.
+            </p>
+          )}
+
+          {modalState?.action === "reactivate" && (
+            <p>
+              Are you sure you want to reactivate <strong>{modalState.user.name}</strong>? They will regain full access to their account.
+            </p>
+          )}
+        </div>
       </Modal>
     </div>
   );
 }
+

@@ -1,3 +1,8 @@
+/**
+ * WARNING: THIS SCRIPT IS DESTRUCTIVE.
+ * It wipes all existing data in the database (SavedEvents, Events, Categories, Users)
+ * before re-populating initial baseline seed data.
+ */
 import { PrismaClient, Role, UserStatus, EventStatus, EventMode } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
@@ -508,6 +513,17 @@ const mockEventsRaw = [
 ];
 
 async function main() {
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_SEED !== 'true') {
+    throw new Error('Refusing to run destructive seed against production — set ALLOW_SEED=true to override if this is intentional.');
+  }
+
+  if (process.env.ALLOW_SEED !== 'true') {
+    console.warn('WARNING: ALLOW_SEED=true environment variable is not set.');
+    console.warn('Skipping seed script to prevent accidental database wiping.');
+    console.warn('To run seed: ALLOW_SEED=true npx prisma db seed');
+    return;
+  }
+
   console.log('Seeding database...');
 
   // 1. Clean existing data in reverse order of foreign keys

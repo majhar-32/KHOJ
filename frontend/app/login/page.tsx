@@ -22,8 +22,14 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ email, password });
-      router.push("/");
+      const user = await login({ email, password });
+      if (user.role === "ADMIN") {
+        router.push("/dashboard/admin");
+      } else if (user.role === "ORGANIZER") {
+        router.push("/dashboard/organizer");
+      } else {
+        router.push("/");
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -83,6 +89,9 @@ export default function LoginPage() {
               {isSubmitting ? "Logging in..." : "Log In"}
             </Button>
           </form>
+          <p className="mt-4 text-xs text-neutral-500 text-center">
+            Note: Admin and Organizer accounts log in using the same form — your role is determined automatically.
+          </p>
         </Card>
       </div>
     </div>

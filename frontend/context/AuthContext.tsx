@@ -24,7 +24,7 @@ interface AuthContextValue {
   role: Role;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (data: LoginData) => Promise<void>;
+  login: (data: LoginData) => Promise<AuthUser>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
 }
@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_KEY, res.token);
     setUser(res.user);
     setToken(res.token);
+    return res.user;
   }, []);
 
   const signup = useCallback(async (data: SignupData) => {
