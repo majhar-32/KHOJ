@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { KhojEvent } from "@/lib/types";
+import { getEventsByOrganizer } from "@/lib/eventsApi";
 import { Card } from "@/components/ui/Card";
 import { StatusChip, CategoryTag, DeadlineBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
