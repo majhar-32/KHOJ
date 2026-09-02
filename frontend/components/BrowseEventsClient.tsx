@@ -23,12 +23,20 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   
   const initialQ = searchParams.get("q") || "";
+  const initialCategory = searchParams.get("category") || "all";
   
   const [searchQuery, setSearchQuery] = useState(initialQ);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedMode, setSelectedMode] = useState("all");
   const [selectedCity, setSelectedCity] = useState("all");
   const [deadlineBefore, setDeadlineBefore] = useState<string | null>(null);
+
+  useEffect(() => {
+    const catParam = searchParams.get("category");
+    if (catParam) {
+      setSelectedCategory(catParam);
+    }
+  }, [searchParams]);
 
   // Real AI search results
   const [aiSearchResults, setAiSearchResults] = useState<KhojEvent[] | null>(null);
