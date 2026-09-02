@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f9fafb;
   --foreground: #111827;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --nav-border: rgba(209, 213, 219, 0.7);
+}
+
+.dark {
+  --background: #0b0f19;
+  --foreground: #f3f4f6;
+  --card-bg: #111827;
+  --card-border: #1f2937;
+  --nav-bg: rgba(17, 24, 39, 0.9);
+  --nav-border: #1f2937;
 }
 
 @theme inline {
@@ -37,9 +50,74 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode surface & text color rules */
+.dark body {
+  background-color: #0b0f19;
+  color: #f3f4f6;
+}
+
+.dark .bg-white {
+  background-color: #111827 !important;
+}
+
+.dark .bg-neutral-50 {
+  background-color: #0b0f19 !important;
+}
+
+.dark .bg-neutral-100 {
+  background-color: #1f2937 !important;
+}
+
+.dark .text-neutral-900 {
+  color: #f9fafb !important;
+}
+
+.dark .text-neutral-800 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-neutral-700 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-neutral-600 {
+  color: #9ca3af !important;
+}
+
+.dark .text-neutral-500 {
+  color: #9ca3af !important;
+}
+
+.dark .border-neutral-200,
+.dark .border-neutral-300,
+.dark .border-neutral-300\/70 {
+  border-color: #1f2937 !important;
+}
+
+.dark .hover\:bg-neutral-100:hover {
+  background-color: #1f2937 !important;
+}
+
+.dark .hover\:bg-neutral-50:hover {
+  background-color: #161e2e !important;
+}
+
+.dark .hover\:text-neutral-900:hover {
+  color: #ffffff !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
 }
 
 /* visible keyboard focus, respected everywhere */
