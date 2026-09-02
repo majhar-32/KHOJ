@@ -19,7 +19,7 @@ interface BrowseEventsClientProps {
 export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   
   const initialQ = searchParams.get("q") || "";
@@ -71,6 +71,13 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     params.set("q", query);
     router.replace(`/events?${params.toString()}`);
   };
+
+  // Redirect unauthenticated visitors to /login
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   // Fetch user's saved events if logged in
   useEffect(() => {

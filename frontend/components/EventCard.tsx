@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { KhojEvent } from "@/lib/types";
 import { toggleSaveEvent } from "@/lib/eventsApi";
 import { useAuth } from "@/context/AuthContext";
@@ -31,6 +32,7 @@ export function EventCard({
   isSaved,
   onToggleSave,
 }: EventCardProps) {
+  const router = useRouter();
   const { token, isAuthenticated } = useAuth();
   const [saved, setSaved] = useState(isSaved ?? !!event.saved);
   const [toast, setToast] = useState<string | null>(null);
@@ -46,10 +48,20 @@ export function EventCard({
       (1000 * 3600 * 24)
   );
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      router.push("/login");
+    }
+  };
+
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isAuthenticated || !token) return;
+    if (!isAuthenticated || !token) {
+      router.push("/login");
+      return;
+    }
 
     const nextSaved = !saved;
     setSaved(nextSaved);
@@ -71,6 +83,7 @@ export function EventCard({
     <>
       <Link
         href={`/events/${event.id}`}
+        onClick={handleCardClick}
         className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-xl"
       >
         <Card
@@ -100,25 +113,23 @@ export function EventCard({
               <CategoryTag label={event.category} />
               <div className="flex items-center gap-1">
                 {showStatus && <StatusChip status={event.status} />}
-                {isAuthenticated && (
-                  <button
-                    onClick={handleSave}
-                    aria-label={
+                <button
+                  onClick={handleSave}
+                  aria-label={
+                    saved
+                      ? `Remove ${event.name} from saved`
+                      : `Save ${event.name}`
+                  }
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-white/80 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-800 shadow-sm transition-colors"
+                >
+                  <Bookmark
+                    className={`h-4 w-4 ${
                       saved
-                        ? `Remove ${event.name} from saved`
-                        : `Save ${event.name}`
-                    }
-                    className="h-8 w-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
-                  >
-                    <Bookmark
-                      className={`h-4 w-4 ${
-                        saved
-                          ? "fill-primary-600 text-primary-600"
-                          : "text-neutral-600"
-                      }`}
-                    />
-                  </button>
-                )}
+                        ? "fill-primary-600 text-primary-600 dark:fill-primary-400 dark:text-primary-400"
+                        : "text-neutral-600 dark:text-neutral-300"
+                    }`}
+                  />
+                </button>
               </div>
             </div>
 

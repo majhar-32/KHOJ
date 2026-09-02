@@ -6,6 +6,8 @@ import { Search, Sparkles } from "lucide-react";
 import { searchEvents } from "@/lib/eventsApi";
 import { KhojEvent } from "@/lib/types";
 
+import { useAuth } from "@/context/AuthContext";
+
 interface AISearchBarProps {
   initialValue?: string;
   placeholder?: string;
@@ -24,9 +26,14 @@ export function AISearchBar({
   const [query, setQuery] = useState(initialValue);
   const [isSearching, setIsSearching] = useState(false);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
     if (!query.trim()) return;
     
     setIsSearching(true);

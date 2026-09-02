@@ -14,6 +14,7 @@ import {
   Users, Award, Bookmark, ExternalLink, Share2, Copy, Check, ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const bannerToneClasses: Record<string, string> = {
   primary: "bg-primary-50",
@@ -24,11 +25,18 @@ const bannerToneClasses: Record<string, string> = {
 };
 
 export function EventDetailsClient({ event }: { event: KhojEvent }) {
-  const { token, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [saved, setSaved] = useState(!!event.saved);
   const [toast, setToast] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     if (isAuthenticated && token) {
