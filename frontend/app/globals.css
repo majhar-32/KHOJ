@@ -25,8 +25,16 @@
 
   /* Khoj design system — primary */
   --color-primary-50: #EEF2FF;
+  --color-primary-100: #E0E7FF;
+  --color-primary-200: #C7D2FE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
   --color-primary-600: #2F5EFF;
   --color-primary-700: #1F45D6;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+  --color-primary-950: #0F172A;
 
   /* accent (deadlines / urgency) */
   --color-accent-amber-50: #FFF7E8;
@@ -47,6 +55,14 @@
   --color-neutral-300: #D1D5DB;
   --color-neutral-100: #F3F4F6;
   --color-neutral-50: #F9FAFB;
+}
+
+.hero-section-bg {
+  background: linear-gradient(180deg, rgba(238, 242, 255, 0.7) 0%, #ffffff 60%, #f9fafb 100%);
+}
+
+.dark .hero-section-bg {
+  background: linear-gradient(180deg, #0f172a 0%, #0b0f19 70%, #0b0f19 100%) !important;
 }
 
 body {

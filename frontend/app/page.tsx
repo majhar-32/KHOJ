@@ -35,20 +35,20 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors pb-20">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/70 via-white to-neutral-50 dark:from-neutral-900/90 dark:via-neutral-950 dark:to-neutral-950 border-b border-neutral-200/80 dark:border-neutral-800/80 pt-16 pb-16 px-4 sm:px-6">
+      <section className="relative overflow-hidden hero-section-bg border-b border-neutral-200/80 dark:border-neutral-800/80 pt-16 pb-16 px-4 sm:px-6 transition-colors">
         {/* Ambient Decorative Blur Blobs */}
-        <div className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 w-full max-w-4xl h-64 bg-primary-500/10 dark:bg-primary-500/15 blur-3xl rounded-full" aria-hidden="true" />
+        <div className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 w-full max-w-4xl h-64 bg-primary-500/10 dark:bg-primary-600/15 blur-3xl rounded-full" aria-hidden="true" />
 
         <div className="relative mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-100/80 dark:bg-primary-950/80 border border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300 text-xs font-semibold mb-6 backdrop-blur">
-            <Sparkles className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-50 dark:bg-primary-950/80 border border-primary-200 dark:border-primary-800/80 text-primary-700 dark:text-primary-300 text-xs font-semibold mb-6 backdrop-blur">
+            <Sparkles className="w-4 h-4 text-primary-600 dark:text-primary-400" aria-hidden="true" />
             <span>Centralized Event & Contest Discovery Platform</span>
           </div>
 
           <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-5xl md:text-6xl mb-6 leading-[1.15]">
-            Discover Your Next <span className="bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">Opportunity</span>
+            Discover Your Next <span className="bg-gradient-to-r from-primary-600 via-blue-600 to-indigo-600 dark:from-primary-400 dark:via-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">Opportunity</span>
           </h1>
-          <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-10 max-w-2xl mx-auto leading-relaxed">
             Find hackathons, workshops, debates, and tech contests happening across Bangladesh. Centralized in one powerful platform.
           </p>
           
@@ -58,7 +58,7 @@ export default async function Home() {
 
           {/* Real Live Stats / Trust Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
+            <div className="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center shadow-xs transition-colors">
               <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
                 <Calendar className="w-5 h-5" aria-hidden="true" />
               </div>
@@ -66,7 +66,7 @@ export default async function Home() {
               <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Live Events</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
+            <div className="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center shadow-xs transition-colors">
               <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
                 <Tag className="w-5 h-5" aria-hidden="true" />
               </div>
@@ -74,7 +74,7 @@ export default async function Home() {
               <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Categories</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
+            <div className="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center shadow-xs transition-colors">
               <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
                 <Building2 className="w-5 h-5" aria-hidden="true" />
               </div>
@@ -82,7 +82,7 @@ export default async function Home() {
               <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Organizers</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
+            <div className="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center shadow-xs transition-colors">
               <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
                 <MapPin className="w-5 h-5" aria-hidden="true" />
               </div>
