@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Plus, Edit2, Eye } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { getEventsByOrganizer } from "@/lib/eventsApi";
+import { TableRowSkeleton } from "@/components/ui/Skeleton";
 
 export function OrganizerDashboardClient({
   initialEvents = [],
@@ -97,11 +97,11 @@ export function OrganizerDashboardClient({
             </thead>
             <tbody className="divide-y divide-neutral-200 bg-white">
               {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-14 text-center">
-                    <p className="text-sm text-neutral-500">Loading events...</p>
-                  </td>
-                </tr>
+                <>
+                  <TableRowSkeleton cols={5} />
+                  <TableRowSkeleton cols={5} />
+                  <TableRowSkeleton cols={5} />
+                </>
               ) : events.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-14 text-center">

@@ -70,6 +70,35 @@ const rejectEventSchema = z.object({
   reason: z.string().min(1, 'Rejection reason is required'),
 });
 
+const eventListSelect = {
+  id: true,
+  name: true,
+  categoryId: true,
+  organizerId: true,
+  eventDate: true,
+  eventTime: true,
+  venue: true,
+  city: true,
+  mode: true,
+  registrationDeadline: true,
+  registrationFee: true,
+  prizePool: true,
+  eligibility: true,
+  teamSize: true,
+  availableSeats: true,
+  certificateInfo: true,
+  contactInfo: true,
+  registrationLink: true,
+  officialWebsite: true,
+  bannerImageUrl: true,
+  status: true,
+  rejectionReason: true,
+  createdAt: true,
+  updatedAt: true,
+  category: { select: { name: true } },
+  organizer: { select: { name: true, verified: true } },
+};
+
 export const getEvents = async (
   req: Request,
   res: Response,
@@ -106,10 +135,7 @@ export const getEvents = async (
     const events = await prisma.event.findMany({
       where,
       orderBy: { registrationDeadline: 'asc' },
-      include: {
-        category: { select: { name: true } },
-        organizer: { select: { name: true, verified: true } },
-      },
+      select: eventListSelect,
     });
 
     res.status(200).json(events.map(formatEvent));
@@ -126,10 +152,7 @@ export const getAllEventsForAdmin = async (
   try {
     const events = await prisma.event.findMany({
       orderBy: { createdAt: 'desc' },
-      include: {
-        category: { select: { name: true } },
-        organizer: { select: { name: true, verified: true } },
-      },
+      select: eventListSelect,
     });
 
     res.status(200).json(events.map(formatEvent));
@@ -149,10 +172,7 @@ export const getEventsByOrganizer = async (
         organizerId: req.user!.id,
       },
       orderBy: { createdAt: 'desc' },
-      include: {
-        category: { select: { name: true } },
-        organizer: { select: { name: true, verified: true } },
-      },
+      select: eventListSelect,
     });
 
     res.status(200).json(events.map(formatEvent));

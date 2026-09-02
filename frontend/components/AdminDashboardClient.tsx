@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/Input";
 import { Check, X, Eye } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { TableRowSkeleton } from "@/components/ui/Skeleton";
 
 export function AdminDashboardClient({ initialEvents = [] }: { initialEvents?: KhojEvent[] }) {
   const router = useRouter();
@@ -185,11 +186,10 @@ export function AdminDashboardClient({ initialEvents = [] }: { initialEvents?: K
                 </thead>
                 <tbody className="divide-y divide-neutral-200 bg-white">
                   {loading ? (
-                    <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-sm text-neutral-500">
-                        Loading pending events...
-                      </td>
-                    </tr>
+                    <>
+                      <TableRowSkeleton cols={4} />
+                      <TableRowSkeleton cols={4} />
+                    </>
                   ) : pending.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-12 text-center">

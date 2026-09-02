@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../lib/prisma';
-import { UserStatus } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 
 export function formatUser(u: any) {
   return {
@@ -117,3 +117,83 @@ export const reactivateUser = async (
     next(error);
   }
 };
+
+export const promoteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const id = String(req.params.id);
+
+    const existing = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { role: Role.ADMIN },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        verified: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json(formatUser(updated));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const demoteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const id = String(req.params.id);
+
+    if (id === req.user!.id) {
+      res.status(403).json({ error: 'Cannot demote your own account' });
+      return;
+    }
+
+    const existing = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { role: Role.USER },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        verified: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json(formatUser(updated));
+  } catch (error) {
+    next(error);
+  }
+};
+

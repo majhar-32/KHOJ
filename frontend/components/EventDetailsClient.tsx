@@ -11,7 +11,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Toast } from "@/components/ui/Toast";
 import {
   Calendar, Clock, MapPin, Monitor, Ticket, Trophy,
-  Users, Award, Bookmark, ExternalLink, Share2, Copy, Check
+  Users, Award, Bookmark, ExternalLink, Share2, Copy, Check, ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
 
@@ -74,6 +74,17 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-24">
+      {/* Top Navigation Bar Link */}
+      <div className="max-w-[1024px] mx-auto px-4 sm:px-6 pt-4 pb-2">
+        <Link
+          href="/events"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-primary-600 transition-colors bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-neutral-200 shadow-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Events
+        </Link>
+      </div>
+
       {/* Hero Banner */}
       <div
         className={`w-full h-48 md:h-72 relative overflow-hidden ${
@@ -95,6 +106,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
       </div>
 
       <div className="max-w-[1024px] mx-auto px-4 sm:px-6 -mt-16 md:-mt-24 relative z-10">
+
         <Card className="p-6 sm:p-8 shadow-sm mb-8">
           <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
             <div className="flex-1">
