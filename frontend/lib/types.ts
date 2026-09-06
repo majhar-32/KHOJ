@@ -34,7 +34,7 @@ export interface KhojEvent {
   saved?: boolean;
 }
 
-export type UserRole = "user" | "organizer";
+export type UserRole = "user" | "organizer" | "admin";
 export type UserStatus = "active" | "suspended";
 
 export interface KhojUser {
