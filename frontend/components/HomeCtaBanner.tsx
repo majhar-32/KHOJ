@@ -12,7 +12,7 @@ export function HomeCtaBanner() {
   const handleSubmitClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      router.push("/login");
+      router.push("/signup?role=organizer");
     } else if (role === "organizer") {
       router.push("/dashboard/organizer/submit");
     } else if (role === "admin") {
@@ -62,7 +62,7 @@ export function HomeCtaBanner() {
             Submit New Event
           </button>
           <Link
-            href="/signup"
+            href="/signup?role=organizer"
             className="inline-flex justify-center items-center px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors border border-white/10"
           >
             Create Organizer Account

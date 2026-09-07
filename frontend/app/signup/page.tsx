@@ -1,22 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signup } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<"USER" | "ORGANIZER">("USER");
+
+  const roleParam = searchParams.get("role")?.toLowerCase();
+  const initialRole: "USER" | "ORGANIZER" = roleParam === "organizer" ? "ORGANIZER" : "USER";
+
+  const [selectedRole, setSelectedRole] = useState<"USER" | "ORGANIZER">(initialRole);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (roleParam === "organizer") {
+      setSelectedRole("ORGANIZER");
+    }
+  }, [roleParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +41,11 @@ export default function SignUpPage() {
         password,
         role: selectedRole,
       });
-      router.push("/");
+      if (selectedRole === "ORGANIZER") {
+        router.push("/dashboard/organizer/submit");
+      } else {
+        router.push("/");
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -128,5 +143,13 @@ export default function SignUpPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex items-center justify-center">Loading...</div>}>
+      <SignUpForm />
+    </Suspense>
   );
 }
