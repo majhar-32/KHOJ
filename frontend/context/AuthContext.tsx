@@ -27,6 +27,8 @@ interface AuthContextValue {
   login: (data: LoginData) => Promise<AuthUser>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
+  updateUser: (user: AuthUser) => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -82,6 +84,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
   }, []);
 
+  const updateUser = useCallback((updatedUser: AuthUser) => {
+    setUser(updatedUser);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const currentToken = token || localStorage.getItem(TOKEN_KEY);
+    if (!currentToken) return;
+    try {
+      const res = await getMe(currentToken);
+      setUser(res.user);
+    } catch {
+      // ignore
+    }
+  }, [token]);
+
   // Derive role matching frontend's Role type ("user" | "organizer" | "admin")
   const role: Role = user ? (user.role.toLowerCase() as Role) : "user";
 
@@ -96,6 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         signup,
         logout,
+        updateUser,
+        refreshUser,
       }}
     >
       {children}

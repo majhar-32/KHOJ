@@ -32,6 +32,7 @@ export const getSavedEvents = async (
       .map((record) => ({
         ...formatEvent(record.event),
         saved: true,
+        registered: record.registered,
       }));
 
     res.status(200).json(formattedEvents);
@@ -94,3 +95,55 @@ export const toggleSaveEvent = async (
     next(error);
   }
 };
+
+export const toggleRegisterEvent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const eventId = String(req.params.id || req.params.eventId);
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      res.status(404).json({ error: 'Event not found' });
+      return;
+    }
+
+    const existing = await prisma.savedEvent.findUnique({
+      where: {
+        userId_eventId: {
+          userId,
+          eventId,
+        },
+      },
+    });
+
+    if (existing) {
+      const updated = await prisma.savedEvent.update({
+        where: { id: existing.id },
+        data: {
+          registered: !existing.registered,
+        },
+      });
+      res.status(200).json({ saved: true, registered: updated.registered });
+      return;
+    }
+
+    const created = await prisma.savedEvent.create({
+      data: {
+        userId,
+        eventId,
+        registered: true,
+      },
+    });
+    res.status(200).json({ saved: true, registered: created.registered });
+  } catch (error) {
+    next(error);
+  }
+};
+

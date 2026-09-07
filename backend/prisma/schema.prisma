@@ -38,9 +38,13 @@ model User {
   email        String     @unique
   passwordHash String
   role         Role       @default(USER)
-  verified     Boolean    @default(false)
-  status       UserStatus @default(ACTIVE)
-  createdAt    DateTime   @default(now())
+  verified          Boolean    @default(false)
+  status            UserStatus @default(ACTIVE)
+  dateOfBirth       DateTime?
+  institution       String?
+  address           String?
+  profilePictureUrl String?
+  createdAt         DateTime   @default(now())
 
   eventsOrganized Event[]      @relation("OrganizerEvents")
   savedEvents     SavedEvent[]
@@ -97,8 +101,9 @@ model SavedEvent {
   user    User   @relation(fields: [userId], references: [id])
   userId  String
   event   Event  @relation(fields: [eventId], references: [id])
-  eventId String
-  savedAt DateTime @default(now())
+  eventId    String
+  registered Boolean  @default(false)
+  savedAt    DateTime @default(now())
 
   @@unique([userId, eventId])
   @@map("saved_events")

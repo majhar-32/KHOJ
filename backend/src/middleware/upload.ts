@@ -29,5 +29,32 @@ export const upload = multer({
   },
 });
 
+const profilePictureStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (_req: Request, file: Express.Multer.File) => {
+    return {
+      folder: 'khoj-profile-pictures',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+      public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9]/g, '_')}`,
+    };
+  },
+});
+
+export const profilePictureUpload = multer({
+  storage: profilePictureStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPG, PNG, and WebP images are allowed.'));
+    }
+  },
+});
+
 export const uploadBanner = upload.single('banner');
+export const uploadProfilePicture = profilePictureUpload.single('picture');
 export default upload;
