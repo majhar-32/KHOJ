@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { KhojEvent } from "@/lib/types";
 import { toggleSaveEvent, getSavedEvents } from "@/lib/eventsApi";
+import { toggleRegisterEvent } from "@/lib/profileApi";
 import { useAuth } from "@/context/AuthContext";
 import { CategoryTag, DeadlineBadge, StatusChip } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -11,7 +12,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Toast } from "@/components/ui/Toast";
 import {
   Calendar, Clock, MapPin, Monitor, Ticket, Trophy,
-  Users, Award, Bookmark, ExternalLink, Share2, Copy, Check, ArrowLeft
+  Users, Award, Bookmark, ExternalLink, Share2, Copy, Check, ArrowLeft, CheckCircle2
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,6 +29,8 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
   const router = useRouter();
   const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [saved, setSaved] = useState(!!event.saved);
+  const [registered, setRegistered] = useState(!!event.registered);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -42,11 +45,19 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
     if (isAuthenticated && token) {
       getSavedEvents(token)
         .then((savedEvents) => {
-          setSaved(savedEvents.some((e) => e.id === event.id));
+          const matching = savedEvents.find((e) => e.id === event.id);
+          if (matching) {
+            setSaved(true);
+            setRegistered(!!matching.registered);
+          } else {
+            setSaved(false);
+            setRegistered(false);
+          }
         })
         .catch(() => {});
     } else {
       setSaved(false);
+      setRegistered(false);
     }
   }, [isAuthenticated, token, event.id]);
 
@@ -71,6 +82,29 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
     }
   };
 
+  const handleToggleRegister = async () => {
+    if (!isAuthenticated || !token) {
+      router.push("/login");
+      return;
+    }
+    setIsRegistering(true);
+    const nextRegistered = !registered;
+    setRegistered(nextRegistered);
+    if (!saved && nextRegistered) setSaved(true);
+    setToast(nextRegistered ? "Marked as registered!" : "Registration unmarked");
+
+    try {
+      const updated = await toggleRegisterEvent(event.id, token);
+      setRegistered(updated.registered);
+      setSaved(updated.saved);
+    } catch {
+      setRegistered(!nextRegistered);
+      setToast("Failed to update registration status");
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = `Check out this event: ${event.name}`;
 
@@ -81,12 +115,12 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 pb-24">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-24">
       {/* Top Navigation Bar Link */}
       <div className="max-w-[1024px] mx-auto px-4 sm:px-6 pt-4 pb-2">
         <Link
           href="/events"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-primary-600 transition-colors bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-neutral-200 shadow-sm"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 transition-colors bg-white/80 dark:bg-neutral-900/80 backdrop-blur px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Events
@@ -122,10 +156,16 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                 <CategoryTag label={event.category} />
                 <StatusChip status={event.status} />
                 <DeadlineBadge daysLeft={daysLeft} />
+                {registered && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-sm">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Registered
+                  </span>
+                )}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">{event.name}</h1>
-              <p className="text-lg text-neutral-600">
-                Organized by <span className="font-semibold text-neutral-900">{event.organizerName}</span>
+              <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-2">{event.name}</h1>
+              <p className="text-lg text-neutral-600 dark:text-neutral-300">
+                Organized by <span className="font-semibold text-neutral-900 dark:text-white">{event.organizerName}</span>
                 {event.organizerVerified && (
                   <span className="ml-1 inline-flex items-center text-primary-600" title="Verified Organizer">✓</span>
                 )}
@@ -139,12 +179,28 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                   <ExternalLink className="w-4 h-4 ml-2" aria-hidden="true" />
                 </Button>
               </Link>
+              {isAuthenticated && (
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={handleToggleRegister}
+                  disabled={isRegistering}
+                  className={`w-full font-medium ${
+                    registered
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100"
+                      : "bg-white dark:bg-neutral-800"
+                  }`}
+                >
+                  <CheckCircle2 className={`w-4 h-4 mr-2 ${registered ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-400"}`} />
+                  {registered ? "Registered (Confirmed)" : "Mark as Registered"}
+                </Button>
+              )}
               <div className="flex gap-2">
                 {isAuthenticated && (
                   <Button
                     size="lg"
                     variant="secondary"
-                    className="flex-1 bg-white"
+                    className="flex-1 bg-white dark:bg-neutral-800"
                     onClick={handleSave}
                     aria-label={saved ? "Remove from saved" : "Save event"}
                   >
@@ -158,7 +214,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                 <Button
                   size="lg"
                   variant="secondary"
-                  className={`bg-white ${!isAuthenticated ? "flex-1" : ""}`}
+                  className={`bg-white dark:bg-neutral-800 ${!isAuthenticated ? "flex-1" : ""}`}
                   onClick={() => setShareOpen(true)}
                   aria-label="Share event"
                 >
@@ -279,14 +335,26 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
       </div>
 
       {/* Mobile Sticky Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-neutral-200 md:hidden z-50 flex gap-3">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 md:hidden z-50 flex gap-2">
         <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
           <Button className="w-full" size="lg">Register Now</Button>
         </Link>
         {isAuthenticated && (
-          <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-white">
-            <Bookmark className={`w-5 h-5 ${saved ? "fill-primary-600 text-primary-600" : ""}`} aria-hidden="true" />
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={handleToggleRegister}
+              disabled={isRegistering}
+              aria-label={registered ? "Registered" : "Mark as Registered"}
+              className={registered ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 border-emerald-300" : "bg-white dark:bg-neutral-800"}
+            >
+              <CheckCircle2 className={`w-5 h-5 ${registered ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-400"}`} aria-hidden="true" />
+            </Button>
+            <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-white dark:bg-neutral-800">
+              <Bookmark className={`w-5 h-5 ${saved ? "fill-primary-600 text-primary-600" : ""}`} aria-hidden="true" />
+            </Button>
+          </>
         )}
       </div>
 

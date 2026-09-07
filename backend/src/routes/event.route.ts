@@ -12,6 +12,7 @@ import {
 import {
   getSavedEvents,
   toggleSaveEvent,
+  toggleRegisterEvent,
 } from '../controllers/savedEvent.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
@@ -36,6 +37,9 @@ router.post('/', authenticate, authorize(Role.ORGANIZER), uploadBanner, createEv
 
 // Save / Bookmark toggle
 router.post('/:id/save', authenticate, toggleSaveEvent);
+
+// Register toggle (auto-saves if not saved yet)
+router.post('/:id/register', authenticate, toggleRegisterEvent);
 
 // Update event (with optional banner upload)
 router.put('/:id', authenticate, authorize(Role.ORGANIZER, Role.ADMIN), uploadBanner, updateEvent);

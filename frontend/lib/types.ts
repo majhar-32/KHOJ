@@ -32,6 +32,7 @@ export interface KhojEvent {
   status: EventStatus;
   rejectionReason?: string;
   saved?: boolean;
+  registered?: boolean;
 }
 
 export type UserRole = "user" | "organizer" | "admin";
@@ -45,6 +46,10 @@ export interface KhojUser {
   verified: boolean;
   status: UserStatus;
   joinedDate: string; // ISO date
+  dateOfBirth?: string | null;
+  institution?: string | null;
+  address?: string | null;
+  profilePictureUrl?: string | null;
 }
 
 export interface KhojCategory {

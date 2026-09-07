@@ -7,6 +7,10 @@ export interface AuthUser {
   role: "USER" | "ORGANIZER" | "ADMIN";
   verified: boolean;
   status: "ACTIVE" | "SUSPENDED";
+  dateOfBirth?: string | null;
+  institution?: string | null;
+  address?: string | null;
+  profilePictureUrl?: string | null;
   createdAt: string;
 }
 

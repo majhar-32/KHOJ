@@ -38,6 +38,10 @@ export const authenticate = async (
         role: true,
         verified: true,
         status: true,
+        dateOfBirth: true,
+        institution: true,
+        address: true,
+        profilePictureUrl: true,
         createdAt: true,
       },
     });

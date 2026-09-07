@@ -8,7 +8,7 @@ import { useTheme } from "@/context/ThemeContext";
 
 export function Navbar() {
   const router = useRouter();
-  const { role, isAuthenticated } = useAuth();
+  const { role, isAuthenticated, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const handleProtectedClick = (e: React.MouseEvent, targetUrl: string) => {
@@ -124,7 +124,15 @@ export function Navbar() {
               aria-label="User profile"
               className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
-              <User className="h-5 w-5" aria-hidden="true" />
+              {user?.profilePictureUrl ? (
+                <img
+                  src={user.profilePictureUrl}
+                  alt={user.name}
+                  className="w-7 h-7 rounded-full object-cover border border-neutral-300 dark:border-neutral-700 shadow-2xs"
+                />
+              ) : (
+                <User className="h-5 w-5" aria-hidden="true" />
+              )}
             </Link>
           ) : (
             <Link
