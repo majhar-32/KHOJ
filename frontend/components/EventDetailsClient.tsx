@@ -201,7 +201,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                   <Calendar className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
                   <div>
                     <p className="font-medium text-neutral-900">Date</p>
-                    <p>{new Date(event.eventDate).toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+                    <p>{new Date(event.eventDate).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
                   </div>
                 </li>
                 <li className="flex gap-3">

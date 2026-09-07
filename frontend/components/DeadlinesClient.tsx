@@ -158,7 +158,7 @@ export function DeadlinesClient() {
                             <div className="flex flex-wrap items-center gap-2 mt-1">
                               <CategoryTag label={event.category} />
                               <span className="text-xs text-neutral-500">
-                                {new Date(event.registrationDeadline).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                                {new Date(event.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                               </span>
                             </div>
                           </div>

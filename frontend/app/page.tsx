@@ -59,36 +59,36 @@ export default async function Home() {
 
           {/* Real Live Stats / Trust Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
-              <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
+            <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-orange-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-orange-200/60 dark:border-orange-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group">
+              <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/80 dark:border-orange-500/30 group-hover:scale-110 transition-transform">
                 <Calendar className="w-5 h-5" aria-hidden="true" />
               </div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-white">{totalEvents}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Live Events</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">{totalEvents}</p>
+              <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Live Events</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
-              <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
+            <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-orange-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-orange-200/60 dark:border-orange-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group">
+              <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/80 dark:border-orange-500/30 group-hover:scale-110 transition-transform">
                 <Tag className="w-5 h-5" aria-hidden="true" />
               </div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-white">{totalCategories}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Categories</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">{totalCategories}</p>
+              <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Categories</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
-              <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
+            <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-orange-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-orange-200/60 dark:border-orange-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group">
+              <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/80 dark:border-orange-500/30 group-hover:scale-110 transition-transform">
                 <Building2 className="w-5 h-5" aria-hidden="true" />
               </div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-white">{uniqueOrganizers}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Organizers</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">{uniqueOrganizers}</p>
+              <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Organizers</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur text-center shadow-xs">
-              <div className="flex justify-center mb-1.5 text-primary-600 dark:text-primary-400">
+            <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-orange-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-orange-200/60 dark:border-orange-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group">
+              <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/80 dark:border-orange-500/30 group-hover:scale-110 transition-transform">
                 <MapPin className="w-5 h-5" aria-hidden="true" />
               </div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-white">{uniqueCities}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Cities Covered</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">{uniqueCities}</p>
+              <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Cities Covered</p>
             </div>
           </div>
         </div>

@@ -201,7 +201,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                         )}
                       </td>
                       <td className="px-6 py-4 text-neutral-500">
-                        {new Date(user.joinedDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        {new Date(user.joinedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${

@@ -120,7 +120,7 @@ export function OrganizerDashboardClient({
                     <tr key={event.id} className="hover:bg-neutral-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="font-medium text-neutral-900">{event.name}</div>
-                        <div className="text-xs text-neutral-500 mt-1">{new Date(event.eventDate).toLocaleDateString()}</div>
+                        <div className="text-xs text-neutral-500 mt-1">{new Date(event.eventDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
                       </td>
                       <td className="px-6 py-4">
                         <CategoryTag label={event.category} />
