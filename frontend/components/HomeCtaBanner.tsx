@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { Rocket, ShieldCheck } from "lucide-react";
+import { Rocket, ShieldCheck, Info } from "lucide-react";
+import { Toast } from "@/components/ui/Toast";
 
 export function HomeCtaBanner() {
   const router = useRouter();
   const { isAuthenticated, role } = useAuth();
+  const [toast, setToast] = useState<string | null>(null);
 
   const handleSubmitClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -15,10 +18,10 @@ export function HomeCtaBanner() {
       router.push("/signup?role=organizer");
     } else if (role === "organizer") {
       router.push("/dashboard/organizer/submit");
-    } else if (role === "admin") {
-      router.push("/dashboard/admin");
     } else {
-      router.push("/dashboard/organizer/submit");
+      // Logged in as USER or ADMIN
+      setToast("Only organizer accounts can submit events — create one below");
+      router.push("/signup?role=organizer");
     }
   };
 
@@ -54,21 +57,32 @@ export function HomeCtaBanner() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleSubmitClick}
-            className="inline-flex justify-center items-center px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-semibold text-sm transition-colors shadow-md cursor-pointer"
-          >
-            Submit New Event
-          </button>
-          <Link
-            href="/signup?role=organizer"
-            className="inline-flex justify-center items-center px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors border border-white/10"
-          >
-            Create Organizer Account
-          </Link>
+        <div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={handleSubmitClick}
+              className="inline-flex justify-center items-center px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-semibold text-sm transition-colors shadow-md cursor-pointer"
+            >
+              Submit New Event
+            </button>
+            <Link
+              href="/signup?role=organizer"
+              className="inline-flex justify-center items-center px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors border border-white/10"
+            >
+              Create Organizer Account
+            </Link>
+          </div>
+
+          {isAuthenticated && role !== "organizer" && (
+            <p className="mt-3 text-xs text-amber-300/90 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 shrink-0 text-amber-400" />
+              <span>Only organizer accounts can submit events — create one below.</span>
+            </p>
+          )}
         </div>
       </div>
+
+      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }
