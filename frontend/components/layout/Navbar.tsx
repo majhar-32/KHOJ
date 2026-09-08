@@ -6,6 +6,15 @@ import { Search, Bookmark, Clock, LayoutDashboard, Tags, Users, User, Sun, Moon 
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 
+function getInitials(userName?: string) {
+  if (!userName) return "U";
+  const parts = userName.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return parts[0].slice(0, 2).toUpperCase();
+}
+
 export function Navbar() {
   const router = useRouter();
   const { role, isAuthenticated, user } = useAuth();
@@ -127,19 +136,22 @@ export function Navbar() {
               {user?.profilePictureUrl ? (
                 <img
                   src={user.profilePictureUrl}
-                  alt={user.name}
+                  alt={user.name || "User profile"}
                   className="w-7 h-7 rounded-full object-cover border border-neutral-300 dark:border-neutral-700 shadow-2xs"
                 />
               ) : (
-                <User className="h-5 w-5" aria-hidden="true" />
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-600 via-primary-500 to-indigo-600 text-white font-bold text-[11px] flex items-center justify-center select-none shadow-2xs border border-primary-400/30 dark:border-primary-500/30">
+                  {getInitials(user?.name)}
+                </div>
               )}
             </Link>
           ) : (
             <Link
               href="/login"
-              className="px-3 py-1.5 text-xs font-semibold text-primary-700 bg-primary-50 dark:bg-primary-950 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-lg transition-colors"
+              aria-label="Log in"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
-              Log In
+              <User className="h-5 w-5" aria-hidden="true" />
             </Link>
           )}
         </div>

@@ -20,7 +20,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState<"all" | "user" | "organizer" | "admin">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "suspended">("all");
-  
+
   const [modalState, setModalState] = useState<{
     user: KhojUser;
     action: ModalActionType;
@@ -176,13 +176,12 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                       <td className="px-6 py-4 font-medium text-neutral-900">{user.name}</td>
                       <td className="px-6 py-4">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          isAdmin
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${isAdmin
                             ? "bg-purple-100 text-purple-700 border border-purple-200"
                             : user.role === "organizer"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-neutral-100 text-neutral-700"
-                        }`}>
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-neutral-100 text-neutral-700"
+                          }`}>
                           {isAdmin && <ShieldAlert className="w-3 h-3" />}
                           {user.role.toUpperCase()}
                         </span>
@@ -204,11 +203,10 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                         {new Date(user.joinedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                          user.status === "active"
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${user.status === "active"
                             ? "bg-success-50 text-success-700"
                             : "bg-error-50 text-error-700"
-                        }`}>
+                          }`}>
                           {user.status === "active" ? "Active" : "Suspended"}
                         </span>
                       </td>
@@ -273,10 +271,10 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
           modalState?.action === "promote"
             ? "Promote to Admin"
             : modalState?.action === "demote"
-            ? "Demote to Standard User"
-            : modalState?.action === "suspend"
-            ? "Suspend User"
-            : "Reactivate User"
+              ? "Demote to Standard User"
+              : modalState?.action === "suspend"
+                ? "Suspend User"
+                : "Reactivate User"
         }
         footer={
           <>
@@ -293,12 +291,12 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
               {isProcessing
                 ? "Processing..."
                 : modalState?.action === "promote"
-                ? "Confirm Promotion"
-                : modalState?.action === "demote"
-                ? "Confirm Demotion"
-                : modalState?.action === "suspend"
-                ? "Suspend User"
-                : "Reactivate User"}
+                  ? "Confirm Promotion"
+                  : modalState?.action === "demote"
+                    ? "Confirm Demotion"
+                    : modalState?.action === "suspend"
+                      ? "Suspend User"
+                      : "Reactivate User"}
             </Button>
           </>
         }
