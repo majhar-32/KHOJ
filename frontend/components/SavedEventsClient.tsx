@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { KhojEvent } from "@/lib/types";
 import { getSavedEvents } from "@/lib/eventsApi";
 import { useAuth } from "@/context/AuthContext";
@@ -10,6 +11,7 @@ import { Bookmark, LogIn } from "lucide-react";
 import Link from "next/link";
 
 export function SavedEventsClient() {
+  const searchParams = useSearchParams();
   const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [savedEvents, setSavedEvents] = useState<KhojEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,18 @@ export function SavedEventsClient() {
     }
   }, [isAuthenticated, token, authLoading, fetchSaved]);
 
-  const [filter, setFilter] = useState<"all" | "registered">("all");
+  const [filter, setFilter] = useState<"all" | "registered">(() => {
+    return searchParams.get("filter") === "registered" ? "registered" : "all";
+  });
+
+  useEffect(() => {
+    const f = searchParams.get("filter");
+    if (f === "registered") {
+      setFilter("registered");
+    } else {
+      setFilter("all");
+    }
+  }, [searchParams]);
 
   const handleToggleSave = (eventId: string, isNowSaved: boolean) => {
     if (!isNowSaved) {
@@ -103,8 +116,14 @@ export function SavedEventsClient() {
         <div className="flex items-center gap-3 mb-8">
           <Bookmark className="w-7 h-7 text-primary-600" aria-hidden="true" />
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Saved Events</h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-0.5">Events you&apos;ve bookmarked for later</p>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
+              {filter === "registered" ? "Registered Events" : "Saved Events"}
+            </h1>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-0.5">
+              {filter === "registered"
+                ? "Events you have marked as registered"
+                : "Events you've bookmarked for later"}
+            </p>
           </div>
         </div>
 
