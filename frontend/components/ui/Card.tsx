@@ -8,7 +8,7 @@ export function Card({ padded = true, className = "", children, ...props }: Card
   return (
     <div
       className={[
-        "rounded-xl border border-neutral-300/70 bg-white",
+        "rounded-xl border border-border-default bg-bg-surface text-text-primary transition-colors",
         padded ? "p-4" : "",
         className,
       ].join(" ")}

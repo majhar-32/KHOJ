@@ -48,8 +48,8 @@ export function OrganizerDashboardClient({
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Organizer Dashboard</h1>
-          <p className="text-neutral-600">Managing events for <span className="font-medium text-neutral-900">{organizerName}</span></p>
+          <h1 className="text-3xl font-bold text-text-primary mb-2">Organizer Dashboard</h1>
+          <p className="text-text-secondary">Managing events for <span className="font-medium text-text-primary">{organizerName}</span></p>
         </div>
         <Link href="/dashboard/organizer/submit">
           <Button>
@@ -60,25 +60,25 @@ export function OrganizerDashboardClient({
       </div>
 
       {error && (
-        <div className="mb-6 p-4 rounded-lg bg-error-50 border border-error-200 text-error-700 text-sm">
+        <div className="mb-6 p-4 rounded-lg bg-danger/10 border border-danger/30 text-danger text-sm">
           {error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6">
-          <p className="text-sm font-medium text-neutral-500 mb-1">Total Events</p>
-          <p className="text-3xl font-bold text-neutral-900">{events.length}</p>
+          <p className="text-sm font-medium text-text-muted mb-1">Total Events</p>
+          <p className="text-3xl font-bold text-text-primary">{events.length}</p>
         </Card>
         <Card className="p-6">
-          <p className="text-sm font-medium text-neutral-500 mb-1">Approved</p>
-          <p className="text-3xl font-bold text-success-600">
+          <p className="text-sm font-medium text-text-muted mb-1">Approved</p>
+          <p className="text-3xl font-bold text-success">
             {events.filter(e => e.status === "approved").length}
           </p>
         </Card>
         <Card className="p-6">
-          <p className="text-sm font-medium text-neutral-500 mb-1">Pending Review</p>
-          <p className="text-3xl font-bold text-warning-600">
+          <p className="text-sm font-medium text-text-muted mb-1">Pending Review</p>
+          <p className="text-3xl font-bold text-warning">
             {events.filter(e => e.status === "pending").length}
           </p>
         </Card>
@@ -86,8 +86,8 @@ export function OrganizerDashboardClient({
 
       <Card padded={false} className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-neutral-600">
-            <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-900">
+          <table className="w-full text-left text-sm text-text-secondary">
+            <thead className="bg-bg-surface-secondary border-b border-border-default text-text-primary">
               <tr>
                 <th className="px-6 py-4 font-medium">Event Name</th>
                 <th className="px-6 py-4 font-medium">Category</th>
@@ -96,7 +96,7 @@ export function OrganizerDashboardClient({
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-200 bg-white">
+            <tbody className="divide-y divide-border-default bg-bg-surface">
               {loading ? (
                 <>
                   <TableRowSkeleton cols={5} />
@@ -106,8 +106,8 @@ export function OrganizerDashboardClient({
               ) : events.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-14 text-center">
-                    <p className="text-lg font-medium text-neutral-900 mb-1">No events yet</p>
-                    <p className="text-sm text-neutral-500">You haven&apos;t submitted any events. Click &ldquo;Submit New Event&rdquo; to get started.</p>
+                    <p className="text-lg font-medium text-text-primary mb-1">No events yet</p>
+                    <p className="text-sm text-text-muted">You haven&apos;t submitted any events. Click &ldquo;Submit New Event&rdquo; to get started.</p>
                   </td>
                 </tr>
               ) : (
@@ -117,10 +117,10 @@ export function OrganizerDashboardClient({
                   );
                   
                   return (
-                    <tr key={event.id} className="hover:bg-neutral-50 transition-colors">
+                    <tr key={event.id} className="hover:bg-bg-surface-secondary/70 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="font-medium text-neutral-900">{event.name}</div>
-                        <div className="text-xs text-neutral-500 mt-1">{new Date(event.eventDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                        <div className="font-medium text-text-primary">{event.name}</div>
+                        <div className="text-xs text-text-muted mt-1">{new Date(event.eventDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
                       </td>
                       <td className="px-6 py-4">
                         <CategoryTag label={event.category} />
@@ -128,7 +128,7 @@ export function OrganizerDashboardClient({
                       <td className="px-6 py-4">
                         <StatusChip status={event.status} />
                         {event.status === "rejected" && event.rejectionReason && (
-                          <div className="text-xs text-error-600 mt-1 max-w-[200px] truncate" title={event.rejectionReason}>
+                          <div className="text-xs text-danger mt-1 max-w-[200px] truncate" title={event.rejectionReason}>
                             Reason: {event.rejectionReason}
                           </div>
                         )}
@@ -139,12 +139,12 @@ export function OrganizerDashboardClient({
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
                           <Link href={`/events/${event.id}`}>
-                            <Button variant="ghost" size="sm" aria-label={`View ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
+                            <Button variant="ghost" size="sm" aria-label={`View ${event.name}`} className="h-8 px-2 text-text-muted hover:text-accent">
                               <Eye className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </Link>
                           <Link href={`/dashboard/organizer/edit/${event.id}`}>
-                            <Button variant="ghost" size="sm" aria-label={`Edit ${event.name}`} className="h-8 px-2 text-neutral-500 hover:text-primary-600">
+                            <Button variant="ghost" size="sm" aria-label={`Edit ${event.name}`} className="h-8 px-2 text-text-muted hover:text-accent">
                               <Edit2 className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </Link>

@@ -33,10 +33,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors">
+      <body className="min-h-full flex flex-col bg-bg-page text-text-primary transition-colors">
         <ThemeProvider>
           <AuthProvider>
-            <Suspense fallback={<div className="h-16 border-b border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90" />}>
+            <Suspense fallback={<div className="h-16 border-b border-border-default bg-bg-surface/90" />}>
               <Navbar />
             </Suspense>
             <main className="flex-1">{children}</main>

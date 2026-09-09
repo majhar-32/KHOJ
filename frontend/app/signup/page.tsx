@@ -58,37 +58,37 @@ function SignUpForm() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-64px)] bg-bg-page flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 transition-colors">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900">
+          <h2 className="text-3xl font-extrabold tracking-tight text-text-primary">
             Create an account
           </h2>
-          <p className="mt-2 text-sm text-neutral-600">
+          <p className="mt-2 text-sm text-text-secondary">
             Or{" "}
-            <Link href="/login" className="font-medium text-primary-600 hover:text-primary-500">
+            <Link href="/login" className="font-semibold text-accent hover:underline">
               log in to your existing account
             </Link>
           </p>
         </div>
 
-        <Card className="p-6 sm:p-8">
+        <Card className="p-6 sm:p-8 border-border-default bg-bg-surface shadow-xl">
           {error && (
-            <div className="mb-4 p-3 text-sm text-error-700 bg-error-50 border border-error-200 rounded-lg">
+            <div className="mb-4 p-3 text-sm text-danger bg-danger/15 border border-danger/30 rounded-lg">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Segmented Control for Role */}
-            <div className="flex p-1 bg-neutral-100 rounded-lg">
+            <div className="flex p-1 bg-bg-surface-secondary border border-border-default rounded-xl">
               <button
                 type="button"
                 onClick={() => setSelectedRole("USER")}
-                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                className={`flex-1 py-2 px-4 text-sm font-semibold rounded-lg transition-all ${
                   selectedRole === "USER"
-                    ? "bg-white text-neutral-900 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-700"
+                    ? "bg-bg-surface text-text-primary shadow-xs border border-border-default"
+                    : "text-text-muted hover:text-text-primary"
                 }`}
               >
                 Find events
@@ -96,10 +96,10 @@ function SignUpForm() {
               <button
                 type="button"
                 onClick={() => setSelectedRole("ORGANIZER")}
-                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                className={`flex-1 py-2 px-4 text-sm font-semibold rounded-lg transition-all ${
                   selectedRole === "ORGANIZER"
-                    ? "bg-white text-neutral-900 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-700"
+                    ? "bg-bg-surface text-text-primary shadow-xs border border-border-default"
+                    : "text-text-muted hover:text-text-primary"
                 }`}
               >
                 Publish events
@@ -148,7 +148,7 @@ function SignUpForm() {
 
 export default function SignUpPage() {
   return (
-    <Suspense fallback={<div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-[calc(100vh-64px)] bg-bg-page text-text-muted flex items-center justify-center">Loading...</div>}>
       <SignUpForm />
     </Suspense>
   );

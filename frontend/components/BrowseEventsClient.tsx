@@ -151,11 +151,11 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
   return (
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">Explore Events</h1>
-        <p className="text-neutral-600">Discover and participate in upcoming opportunities.</p>
+        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight mb-2">Explore Events</h1>
+        <p className="text-text-secondary">Discover and participate in upcoming opportunities.</p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         {/* Search Bar */}
         <div className="flex-1">
           <AISearchBar 
@@ -210,7 +210,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
           </Select>
 
           {hasActiveFilters && (
-            <Button variant="ghost" onClick={clearFilters} className="w-full sm:w-auto text-neutral-600 hover:text-neutral-900">
+            <Button variant="ghost" onClick={clearFilters} className="w-full sm:w-auto text-text-secondary hover:text-text-primary">
               <FilterX className="h-4 w-4 mr-2" />
               Clear
             </Button>
@@ -220,16 +220,16 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
 
       {/* AI Search Indicator */}
       {aiSearchDone && searchQuery && (
-        <div className="mb-8 p-3 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-between gap-3">
+        <div className="mb-8 p-3 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary-600" aria-hidden="true" />
-            <span className="text-sm text-primary-900 font-medium">
+            <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
+            <span className="text-sm text-text-primary font-medium">
               AI search results for &ldquo;{searchQuery}&rdquo; ({filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} found)
             </span>
           </div>
           <button
             onClick={clearFilters}
-            className="text-xs text-primary-600 hover:text-primary-800 font-medium underline"
+            className="text-xs text-accent hover:underline font-semibold"
           >
             Reset search
           </button>
@@ -238,8 +238,8 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
 
       {/* Results */}
       {isInitializing ? (
-        <div className="text-center py-20 bg-white rounded-xl border border-neutral-200">
-          <p className="text-primary-600 font-medium">Analyzing search query...</p>
+        <div className="text-center py-20 bg-bg-surface rounded-2xl border border-border-default">
+          <p className="text-accent font-medium">Analyzing search query...</p>
         </div>
       ) : filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -253,9 +253,9 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white rounded-xl border border-neutral-200">
-          <h3 className="text-lg font-medium text-neutral-900 mb-2">No events found</h3>
-          <p className="text-neutral-500 mb-6">Try adjusting your search or filters to find what you&apos;re looking for.</p>
+        <div className="text-center py-20 bg-bg-surface rounded-2xl border border-border-default">
+          <h3 className="text-lg font-bold text-text-primary mb-2">No events found</h3>
+          <p className="text-text-muted mb-6">Try adjusting your search or filters to find what you&apos;re looking for.</p>
           <Button onClick={clearFilters} variant="secondary">
             Clear all filters
           </Button>

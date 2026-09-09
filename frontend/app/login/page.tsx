@@ -42,23 +42,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-64px)] bg-bg-page flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 transition-colors">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900">
+          <h2 className="text-3xl font-extrabold tracking-tight text-text-primary">
             Welcome back
           </h2>
-          <p className="mt-2 text-sm text-neutral-600">
+          <p className="mt-2 text-sm text-text-secondary">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="font-medium text-primary-600 hover:text-primary-500">
+            <Link href="/signup" className="font-semibold text-accent hover:underline">
               Sign up
             </Link>
           </p>
         </div>
 
-        <Card className="p-6 sm:p-8">
+        <Card className="p-6 sm:p-8 border-border-default bg-bg-surface shadow-xl">
           {error && (
-            <div className="mb-4 p-3 text-sm text-error-700 bg-error-50 border border-error-200 rounded-lg">
+            <div className="mb-4 p-3 text-sm text-danger bg-danger/15 border border-danger/30 rounded-lg">
               {error}
             </div>
           )}
@@ -89,12 +89,12 @@ export default function LoginPage() {
               {isSubmitting ? "Logging in..." : "Log In"}
             </Button>
           </form>
-          <p className="mt-4 text-xs text-neutral-500 text-center">
+          <p className="mt-4 text-xs text-text-muted text-center">
             Note: Admin and Organizer accounts log in using the same form — your role is determined automatically.
           </p>
 
-          <div className="mt-5 pt-4 border-t border-neutral-200 dark:border-neutral-800 text-center">
-            <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-2">
+          <div className="mt-5 pt-4 border-t border-border-default text-center">
+            <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-2">
               Quick Demo Logins
             </p>
             <div className="flex flex-wrap justify-center gap-2">
@@ -104,7 +104,7 @@ export default function LoginPage() {
                   setEmail("rahim@example.com");
                   setPassword("password123");
                 }}
-                className="px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-primary-50 dark:hover:bg-primary-950/50 text-neutral-700 dark:text-neutral-300 hover:text-primary-600 border border-neutral-200 dark:border-neutral-700 cursor-pointer transition-colors"
+                className="px-2.5 py-1 text-xs font-semibold rounded-md bg-bg-surface-secondary hover:bg-accent/15 text-text-secondary hover:text-accent border border-border-default cursor-pointer transition-colors"
               >
                 User: Rahim
               </button>
@@ -114,7 +114,7 @@ export default function LoginPage() {
                   setEmail("sadia@example.com");
                   setPassword("password123");
                 }}
-                className="px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-primary-50 dark:hover:bg-primary-950/50 text-neutral-700 dark:text-neutral-300 hover:text-primary-600 border border-neutral-200 dark:border-neutral-700 cursor-pointer transition-colors"
+                className="px-2.5 py-1 text-xs font-semibold rounded-md bg-bg-surface-secondary hover:bg-accent/15 text-text-secondary hover:text-accent border border-border-default cursor-pointer transition-colors"
               >
                 Organizer: Sadia
               </button>
@@ -124,7 +124,7 @@ export default function LoginPage() {
                   setEmail("admin@khoj.dev");
                   setPassword("password123");
                 }}
-                className="px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-primary-50 dark:hover:bg-primary-950/50 text-neutral-700 dark:text-neutral-300 hover:text-primary-600 border border-neutral-200 dark:border-neutral-700 cursor-pointer transition-colors"
+                className="px-2.5 py-1 text-xs font-semibold rounded-md bg-bg-surface-secondary hover:bg-accent/15 text-text-secondary hover:text-accent border border-border-default cursor-pointer transition-colors"
               >
                 Admin
               </button>

@@ -72,8 +72,8 @@ export function SavedEventsClient() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
-        <div className="max-w-[1280px] mx-auto px-4 py-16 text-center text-neutral-500 dark:text-neutral-400">
+      <div className="min-h-screen bg-bg-page pb-20 transition-colors">
+        <div className="max-w-[1280px] mx-auto px-4 py-16 text-center text-text-muted">
           Loading...
         </div>
       </div>
@@ -82,20 +82,20 @@ export function SavedEventsClient() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
+      <div className="min-h-screen bg-bg-page pb-20 transition-colors">
         <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
           <div className="flex items-center gap-3 mb-8">
-            <Bookmark className="w-7 h-7 text-primary-600" aria-hidden="true" />
+            <Bookmark className="w-7 h-7 text-accent" aria-hidden="true" />
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Saved Events</h1>
-              <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-0.5">Events you&apos;ve bookmarked for later</p>
+              <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">Saved Events</h1>
+              <p className="text-text-secondary text-sm mt-0.5">Events you&apos;ve bookmarked for later</p>
             </div>
           </div>
 
-          <div className="text-center py-20 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800">
-            <Bookmark className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" aria-hidden="true" />
-            <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">Log in to view saved events</h2>
-            <p className="text-neutral-500 dark:text-neutral-400 mb-6 max-w-md mx-auto">
+          <div className="text-center py-20 bg-bg-surface rounded-2xl border border-border-default shadow-xs">
+            <Bookmark className="w-10 h-10 text-text-muted mx-auto mb-4" aria-hidden="true" />
+            <h2 className="text-lg font-bold text-text-primary mb-2">Log in to view saved events</h2>
+            <p className="text-text-muted mb-6 max-w-md mx-auto">
               Please sign in to your Khoj account to view and manage your bookmarked events.
             </p>
             <Link href="/login">
@@ -111,15 +111,15 @@ export function SavedEventsClient() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
+    <div className="min-h-screen bg-bg-page pb-20 transition-colors">
       <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
         <div className="flex items-center gap-3 mb-8">
-          <Bookmark className="w-7 h-7 text-primary-600" aria-hidden="true" />
+          <Bookmark className="w-7 h-7 text-accent" aria-hidden="true" />
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
+            <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
               {filter === "registered" ? "Registered Events" : "Saved Events"}
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-0.5">
+            <p className="text-text-secondary text-sm mt-0.5">
               {filter === "registered"
                 ? "Events you have marked as registered"
                 : "Events you've bookmarked for later"}
@@ -128,20 +128,20 @@ export function SavedEventsClient() {
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg border border-error-300 bg-error-50 dark:bg-error-950/40 px-4 py-3 text-sm text-error-700 dark:text-error-300">
+          <div className="mb-6 rounded-lg border border-danger/30 bg-danger/15 px-4 py-3 text-sm text-danger font-medium">
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="text-center py-20 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400">
+          <div className="text-center py-20 bg-bg-surface rounded-2xl border border-border-default text-text-muted">
             Loading your saved events...
           </div>
         ) : savedEvents.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800">
-            <Bookmark className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" aria-hidden="true" />
-            <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">No saved events yet</h2>
-            <p className="text-neutral-500 dark:text-neutral-400 mb-6">
+          <div className="text-center py-20 bg-bg-surface rounded-2xl border border-border-default shadow-xs">
+            <Bookmark className="w-10 h-10 text-text-muted mx-auto mb-4" aria-hidden="true" />
+            <h2 className="text-lg font-bold text-text-primary mb-2">No saved events yet</h2>
+            <p className="text-text-muted mb-6">
               Bookmark events while browsing to keep track of ones you&apos;re interested in.
             </p>
             <Link href="/events">
@@ -152,14 +152,14 @@ export function SavedEventsClient() {
           <>
             {/* Filter Tabs & Counter */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div className="inline-flex rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-1">
+              <div className="inline-flex rounded-xl border border-border-default bg-bg-surface-secondary p-1">
                 <button
                   type="button"
                   onClick={() => setFilter("all")}
-                  className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     filter === "all"
-                      ? "bg-primary-600 text-white shadow-sm"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-bg-surface text-text-primary shadow-xs border border-border-default"
+                      : "text-text-muted hover:text-text-primary"
                   }`}
                 >
                   All Saved ({savedEvents.length})
@@ -167,24 +167,24 @@ export function SavedEventsClient() {
                 <button
                   type="button"
                   onClick={() => setFilter("registered")}
-                  className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     filter === "registered"
-                      ? "bg-emerald-600 text-white shadow-sm"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-success text-white shadow-xs"
+                      : "text-text-muted hover:text-text-primary"
                   }`}
                 >
                   Registered ({registeredCount})
                 </button>
               </div>
 
-              <Link href="/events" className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400">
+              <Link href="/events" className="text-sm font-semibold text-accent hover:underline">
                 Browse more →
               </Link>
             </div>
 
             {displayedEvents.length === 0 ? (
-              <div className="text-center py-16 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800">
-                <p className="text-neutral-500 dark:text-neutral-400">
+              <div className="text-center py-16 bg-bg-surface rounded-2xl border border-border-default">
+                <p className="text-text-muted">
                   {filter === "registered"
                     ? "No saved events marked as registered yet. Check the 'Mark as Registered' button on any saved event to track it here!"
                     : "No events found."}

@@ -179,7 +179,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
     <span className="flex items-center gap-2">
       {text}
       {aiFilledFields.has(id) && (
-        <span className="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-medium text-primary-700 border border-primary-200">
+        <span className="inline-flex items-center rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent border border-accent/30">
           <Sparkles className="w-3 h-3 mr-1" aria-hidden="true" />
           AI-filled
         </span>
@@ -190,10 +190,10 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+        <h1 className="text-3xl font-bold text-text-primary mb-2">
           {mode === "edit" ? "Edit Event" : "Submit New Event"}
         </h1>
-        <p className="text-neutral-600">
+        <p className="text-text-secondary">
           {mode === "edit"
             ? "Update the details below. Saving will re-submit this event for admin review."
             : "Fill out the details below to submit your event for review."}
@@ -201,16 +201,16 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
       </div>
 
       {formError && (
-        <div className="mb-6 p-4 rounded-xl border border-error-200 bg-error-50 text-error-700 text-sm">
+        <div className="mb-6 p-4 rounded-xl border border-danger/30 bg-danger/10 text-danger text-sm">
           {formError}
         </div>
       )}
 
       {/* Edit mode banner — warn about re-approval */}
       {mode === "edit" && initialData?.status === "approved" && (
-        <div className="mb-6 flex gap-3 rounded-xl border border-warning-300 bg-warning-50 p-4">
-          <AlertTriangle className="w-5 h-5 text-warning-600 shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-warning-800">
+        <div className="mb-6 flex gap-3 rounded-xl border border-warning/30 bg-warning/15 p-4 text-warning">
+          <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-sm">
             <span className="font-semibold">Editing a live event</span> will require admin re-approval before your changes go public.
           </p>
         </div>
@@ -218,14 +218,14 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
 
       {/* AI Assist Section — only shown in create mode */}
       {mode === "create" && (
-        <Card className="mb-8 p-6 bg-primary-50/50 border-primary-100 border-dashed border-2">
+        <Card className="mb-8 p-6 bg-accent/5 border-accent/30 border-dashed border-2">
           <div className="flex flex-col gap-4">
             <div>
-              <h2 className="text-lg font-bold text-primary-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary-600" aria-hidden="true" />
+              <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />
                 AI-Assisted Autofill (Optional)
               </h2>
-              <p className="text-sm text-primary-700 mt-1">
+              <p className="text-sm text-text-secondary mt-1">
                 Paste your raw event details (like a Facebook post or email) and our AI will try to extract the information for you.
               </p>
             </div>
@@ -245,9 +245,9 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
                 <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
                 {isExtracting ? "Extracting..." : "Auto-fill with AI"}
               </Button>
-              {aiError && <span className="text-sm text-error-600">{aiError}</span>}
+              {aiError && <span className="text-sm text-danger">{aiError}</span>}
               {aiFilledFields.size > 0 && !aiError && (
-                <span className="text-sm text-success-600 font-medium">Successfully extracted data! Please review the fields below.</span>
+                <span className="text-sm text-success font-medium">Successfully extracted data! Please review the fields below.</span>
               )}
             </div>
           </div>
@@ -256,7 +256,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Basic Details</h2>
+          <h2 className="text-xl font-bold text-text-primary mb-4 border-b border-border-default pb-2">Basic Details</h2>
           <div className="space-y-4">
             <Input id="name" label={renderLabel("Event Name", "name")} required value={formData.name} onChange={handleChange} placeholder="e.g. National Hackathon 2024" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -273,7 +273,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
 
             {/* Banner Image Upload */}
             <div>
-              <label htmlFor="banner-upload" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="banner-upload" className="block text-sm font-medium text-text-secondary mb-1">
                 Banner Image (Optional — JPG, PNG, WebP up to 5MB)
               </label>
               <input
@@ -281,10 +281,10 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/jpg"
                 onChange={handleBannerChange}
-                className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                className="block w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-accent/15 file:text-accent hover:file:bg-accent/25 cursor-pointer"
               />
               {bannerPreview && (
-                <div className="mt-3 relative rounded-xl overflow-hidden border border-neutral-200 aspect-[16/9] max-h-48 bg-neutral-100 flex items-center justify-center">
+                <div className="mt-3 relative rounded-xl overflow-hidden border border-border-default aspect-[16/9] max-h-48 bg-bg-surface-secondary flex items-center justify-center">
                   <img
                     src={bannerPreview}
                     alt="Banner preview"
@@ -293,7 +293,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
                   <button
                     type="button"
                     onClick={handleRemoveBanner}
-                    className="absolute top-2 right-2 bg-neutral-900/70 hover:bg-neutral-900 text-white rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition-colors"
+                    className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition-colors"
                   >
                     Remove
                   </button>
@@ -306,7 +306,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Date &amp; Location</h2>
+          <h2 className="text-xl font-bold text-text-primary mb-4 border-b border-border-default pb-2">Date &amp; Location</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <Input id="eventDate" type="date" label={renderLabel("Event Date", "eventDate")} required value={formData.eventDate} onChange={handleChange} />
             <Input id="eventTime" type="time" label={renderLabel("Event Time", "eventTime")} required value={formData.eventTime} onChange={handleChange} />
@@ -322,7 +322,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Registration &amp; Requirements</h2>
+          <h2 className="text-xl font-bold text-text-primary mb-4 border-b border-border-default pb-2">Registration &amp; Requirements</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <Input id="registrationDeadline" type="date" label={renderLabel("Registration Deadline", "registrationDeadline")} required value={formData.registrationDeadline} onChange={handleChange} />
             <Input id="registrationFee" label={renderLabel("Registration Fee", "registrationFee")} required value={formData.registrationFee} onChange={handleChange} placeholder="e.g. Free, or ৳500" />
@@ -336,7 +336,7 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Links &amp; Additional Info</h2>
+          <h2 className="text-xl font-bold text-text-primary mb-4 border-b border-border-default pb-2">Links &amp; Additional Info</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <Input id="prizePool" label={renderLabel("Prize Pool (Optional)", "prizePool")} value={formData.prizePool} onChange={handleChange} placeholder="e.g. ৳50,000 Total" />
             <Input id="certificateInfo" label={renderLabel("Certificate Info (Optional)", "certificateInfo")} value={formData.certificateInfo} onChange={handleChange} placeholder="e.g. Yes, for all participants" />
