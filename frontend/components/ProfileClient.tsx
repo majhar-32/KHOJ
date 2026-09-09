@@ -435,8 +435,12 @@ export function ProfileClient() {
               <User className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-text-primary">Personal Information</h2>
-              <p className="text-xs text-text-secondary">Update your profile details and background</p>
+              <h2 className="text-xl font-bold text-text-primary">
+                {user.role === "ORGANIZER" ? "Organization Information" : "Personal Information"}
+              </h2>
+              <p className="text-xs text-text-secondary">
+                {user.role === "ORGANIZER" ? "Update your organization details and background" : "Update your profile details and background"}
+              </p>
             </div>
           </div>
 
@@ -456,11 +460,11 @@ export function ProfileClient() {
 
           <form onSubmit={handleUpdateProfile} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Full Name */}
+              {/* Full Name / Organization Name */}
               <Input
                 id="name"
-                label="Full Name"
-                placeholder="Enter your full name"
+                label={user.role === "ORGANIZER" ? "Organization Name" : "Full Name"}
+                placeholder={user.role === "ORGANIZER" ? "e.g. CUET Computer Club" : "Enter your full name"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required

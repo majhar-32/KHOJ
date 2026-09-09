@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
@@ -31,7 +31,12 @@ export function Navbar() {
   const searchParams = useSearchParams();
   const { role, isAuthenticated, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filterParam = searchParams.get("filter");
 
@@ -174,13 +179,18 @@ export function Navbar() {
           {/* Theme Toggle Icon */}
           <button
             onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={!mounted ? "Toggle theme" : theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            suppressHydrationWarning
             className="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:text-text-primary hover:bg-bg-surface-secondary transition-colors cursor-pointer shrink-0"
           >
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5 text-warning" aria-hidden="true" />
+            {mounted ? (
+              theme === "dark" ? (
+                <Sun className="h-5 w-5 text-warning" aria-hidden="true" />
+              ) : (
+                <Moon className="h-5 w-5 text-text-secondary" aria-hidden="true" />
+              )
             ) : (
-              <Moon className="h-5 w-5 text-text-secondary" aria-hidden="true" />
+              <div className="h-5 w-5" aria-hidden="true" />
             )}
           </button>
 
