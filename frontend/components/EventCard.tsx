@@ -130,18 +130,18 @@ export function EventCard({
       <Link
         href={`/events/${event.id}`}
         onClick={handleCardClick}
-        className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-xl"
+        className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl"
       >
         <Card
           padded={false}
-          className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow group"
+          className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all group border-border-default bg-bg-surface"
         >
           {/* Banner Container */}
           <div
             className={`h-32 w-full shrink-0 relative p-4 flex flex-col justify-between overflow-hidden ${
               !event.bannerImageUrl
                 ? bannerToneClasses[event.bannerColor] || bannerToneClasses.default
-                : "bg-neutral-900"
+                : "bg-bg-surface-secondary"
             }`}
           >
             {event.bannerImageUrl && (
@@ -151,7 +151,7 @@ export function EventCard({
                   alt={event.name}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-neutral-950/20 to-neutral-950/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
               </>
             )}
 
@@ -166,13 +166,13 @@ export function EventCard({
                       ? `Remove ${event.name} from saved`
                       : `Save ${event.name}`
                   }
-                  className="h-8 w-8 flex items-center justify-center rounded-full bg-white/80 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-800 shadow-sm transition-colors"
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-bg-surface/90 hover:bg-bg-surface shadow-sm border border-border-default transition-colors"
                 >
                   <Bookmark
                     className={`h-4 w-4 ${
                       saved
-                        ? "fill-primary-600 text-primary-600 dark:fill-primary-400 dark:text-primary-400"
-                        : "text-neutral-600 dark:text-neutral-300"
+                        ? "fill-accent text-accent"
+                        : "text-text-secondary"
                     }`}
                   />
                 </button>
@@ -182,7 +182,7 @@ export function EventCard({
             <div className="relative z-10 self-start flex items-center gap-1.5 flex-wrap">
               <DeadlineBadge daysLeft={daysLeft} />
               {registered && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-sm">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success text-white shadow-sm">
                   <CheckCircle2 className="w-3 h-3" />
                   Registered
                 </span>
@@ -191,17 +191,17 @@ export function EventCard({
           </div>
 
           <div className="p-4 flex flex-col flex-grow">
-            <h3 className="font-semibold text-neutral-900 dark:text-white line-clamp-2 text-lg mb-1 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors">
+            <h3 className="font-bold text-text-primary line-clamp-2 text-lg mb-1 group-hover:text-accent transition-colors">
               {event.name}
             </h3>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4 line-clamp-1">
+            <p className="text-sm text-text-secondary mb-4 line-clamp-1">
               by {event.organizerName}
             </p>
 
-            <div className="mt-auto space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
+            <div className="mt-auto space-y-2 text-sm text-text-secondary">
               <div className="flex items-center gap-2">
                 <Ticket
-                  className="w-4 h-4 shrink-0 text-neutral-400"
+                  className="w-4 h-4 shrink-0 text-text-muted"
                   aria-hidden="true"
                 />
                 <span className="truncate">{event.registrationFee}</span>
@@ -211,7 +211,7 @@ export function EventCard({
                 {event.mode === "online" ? (
                   <>
                     <Monitor
-                      className="w-4 h-4 shrink-0 text-neutral-400"
+                      className="w-4 h-4 shrink-0 text-text-muted"
                       aria-hidden="true"
                     />
                     <span>Online</span>
@@ -219,7 +219,7 @@ export function EventCard({
                 ) : (
                   <>
                     <MapPin
-                      className="w-4 h-4 shrink-0 text-neutral-400"
+                      className="w-4 h-4 shrink-0 text-text-muted"
                       aria-hidden="true"
                     />
                     <span className="truncate">{event.city}</span>
@@ -229,22 +229,22 @@ export function EventCard({
             </div>
 
             {showRegisterToggle && (
-              <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+              <div className="mt-4 pt-3 border-t border-border-default">
                 <button
                   type="button"
                   onClick={handleToggleRegister}
                   disabled={isRegistering}
                   className={`w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
                     registered
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
-                      : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700"
+                      ? "bg-success/15 text-success border border-success/30 hover:bg-success/20"
+                      : "bg-bg-surface-secondary text-text-primary hover:bg-border-default border border-border-default"
                   }`}
                 >
                   <CheckCircle2
                     className={`w-3.5 h-3.5 ${
                       registered
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-neutral-400"
+                        ? "text-success"
+                        : "text-text-muted"
                     }`}
                   />
                   {registered ? "Registered (Confirmed)" : "Mark as Registered"}

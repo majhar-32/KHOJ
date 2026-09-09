@@ -4,11 +4,11 @@ import { EventStatus } from "@/lib/types";
 type BadgeTone = "primary" | "success" | "warning" | "error" | "neutral";
 
 const toneClasses: Record<BadgeTone, string> = {
-  primary: "bg-primary-50 text-primary-700",
-  success: "bg-success-50 text-green-700",
-  warning: "bg-warning-50 text-amber-700",
-  error: "bg-error-50 text-red-700",
-  neutral: "bg-neutral-100 text-neutral-600",
+  primary: "bg-accent/15 text-accent border border-accent/30",
+  success: "bg-success/15 text-success border border-success/30",
+  warning: "bg-warning/15 text-warning border border-warning/30",
+  error: "bg-danger/15 text-danger border border-danger/30",
+  neutral: "bg-bg-surface-secondary text-text-secondary border border-border-default",
 };
 
 export function CategoryTag({ label }: { label: string }) {

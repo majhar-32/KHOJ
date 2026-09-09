@@ -215,10 +215,10 @@ export function ProfileClient() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-page flex items-center justify-center">
         <div className="text-center space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto" />
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading your profile...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
+          <p className="text-sm text-text-secondary">Loading your profile...</p>
         </div>
       </div>
     );
@@ -228,21 +228,21 @@ export function ProfileClient() {
     switch (user.role) {
       case "ORGANIZER":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300/80 dark:border-amber-600/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-warning/15 text-warning border border-warning/30">
             <Building2 className="w-3.5 h-3.5" />
             Organizer
           </span>
         );
       case "ADMIN":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border border-purple-300/80 dark:border-purple-600/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/15 text-purple-400 border border-purple-500/30">
             <ShieldCheck className="w-3.5 h-3.5" />
             Administrator
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-primary-500/10 dark:bg-primary-500/20 text-primary-700 dark:text-primary-400 border border-primary-300/80 dark:border-primary-600/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/30">
             <User className="w-3.5 h-3.5" />
             Student / Participant
           </span>
@@ -251,18 +251,18 @@ export function ProfileClient() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-bg-page py-10 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* PROFILE HEADER CARD */}
-        <Card className="p-6 sm:p-8 shadow-sm overflow-hidden relative">
+        <Card className="p-6 sm:p-8 shadow-sm overflow-hidden relative border-border-default bg-bg-surface">
           {/* Subtle Top Accent Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-2.5 bg-gradient-to-r from-primary-600 via-orange-500 to-amber-500" />
+          <div className="absolute top-0 left-0 right-0 h-2.5 bg-gradient-to-r from-accent via-indigo-500 to-amber-500" />
 
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pt-2">
             {/* Avatar & Upload Trigger */}
             <div className="relative group shrink-0">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white dark:border-neutral-800 shadow-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center relative">
+              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-bg-surface-secondary shadow-md bg-bg-surface-secondary flex items-center justify-center relative">
                 {user.profilePictureUrl ? (
                   <img
                     src={user.profilePictureUrl}
@@ -270,14 +270,14 @@ export function ProfileClient() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary-600 via-primary-500 to-indigo-600 text-white font-extrabold text-3xl sm:text-4xl flex items-center justify-center select-none">
+                  <div className="w-full h-full bg-gradient-to-br from-accent via-blue-600 to-indigo-600 text-white font-extrabold text-3xl sm:text-4xl flex items-center justify-center select-none">
                     {getInitials(user.name)}
                   </div>
                 )}
 
                 {/* Uploading Overlay */}
                 {isUploadingPicture && (
-                  <div className="absolute inset-0 bg-neutral-950/60 flex flex-col items-center justify-center text-white text-xs gap-1.5 backdrop-blur-xs">
+                  <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white text-xs gap-1.5 backdrop-blur-xs">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     <span>Uploading...</span>
                   </div>
@@ -291,7 +291,7 @@ export function ProfileClient() {
                 disabled={isUploadingPicture}
                 title="Change Profile Picture"
                 aria-label="Upload profile picture"
-                className="absolute bottom-1 right-1 p-2.5 rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-700 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-neutral-900"
+                className="absolute bottom-1 right-1 p-2.5 rounded-full bg-accent text-white shadow-lg hover:bg-accent-hover active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
               >
                 <Camera className="w-4 h-4" />
               </button>
@@ -308,7 +308,7 @@ export function ProfileClient() {
             {/* Profile Info */}
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
                   {user.name}
                 </h1>
                 <div className="inline-flex justify-center sm:justify-start">
@@ -316,26 +316,26 @@ export function ProfileClient() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-y-1 gap-x-4 text-sm text-neutral-600 dark:text-neutral-400">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-y-1 gap-x-4 text-sm text-text-secondary">
                 <div className="flex items-center gap-1.5">
-                  <Mail className="w-4 h-4 text-neutral-400" />
+                  <Mail className="w-4 h-4 text-text-muted" />
                   <span>{user.email}</span>
                 </div>
                 {user.institution && (
                   <div className="flex items-center gap-1.5">
-                    <GraduationCap className="w-4 h-4 text-neutral-400" />
+                    <GraduationCap className="w-4 h-4 text-text-muted" />
                     <span>{user.institution}</span>
                   </div>
                 )}
                 {user.address && (
                   <div className="flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-neutral-400" />
+                    <MapPin className="w-4 h-4 text-text-muted" />
                     <span>{user.address}</span>
                   </div>
                 )}
               </div>
 
-              <p className="text-xs text-neutral-500 dark:text-neutral-500 pt-1">
+              <p className="text-xs text-text-muted pt-1">
                 Member since {new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
               </p>
             </div>
@@ -345,11 +345,11 @@ export function ProfileClient() {
         {/* ROLE-CONDITIONAL STATS SECTION */}
         <section aria-labelledby="stats-heading">
           <div className="mb-3 flex items-center justify-between">
-            <h2 id="stats-heading" className="text-sm font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+            <h2 id="stats-heading" className="text-sm font-bold uppercase tracking-wider text-text-secondary">
               {user.role === "ORGANIZER" ? "Organizer Performance Overview" : "Your Activity & Milestones"}
             </h2>
             {user.role !== "ORGANIZER" && (
-              <Link href="/saved" className="text-xs font-semibold text-primary-600 dark:text-primary-400 hover:underline">
+              <Link href="/saved" className="text-xs font-semibold text-accent hover:underline">
                 View All Saved Events →
               </Link>
             )}
@@ -358,70 +358,70 @@ export function ProfileClient() {
           {user.role === "ORGANIZER" ? (
             // Organizer Stats (4 cards)
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-orange-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-orange-200/60 dark:border-orange-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group">
-                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/80 dark:border-orange-500/30 group-hover:scale-110 transition-transform">
+              <div className="p-4 rounded-2xl bg-bg-surface border border-warning/30 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-warning/60 transition-all group">
+                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-warning/15 text-warning border border-warning/30 group-hover:scale-110 transition-transform">
                   <Calendar className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <p className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
                   {statsLoading ? "..." : (stats && "totalEvents" in stats ? stats.totalEvents : 0)}
                 </p>
-                <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Total Submitted</p>
+                <p className="text-xs font-semibold text-text-secondary mt-0.5">Total Submitted</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-emerald-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-emerald-200/60 dark:border-emerald-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-all group">
-                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-500/30 group-hover:scale-110 transition-transform">
+              <div className="p-4 rounded-2xl bg-bg-surface border border-success/30 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-success/60 transition-all group">
+                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-success/15 text-success border border-success/30 group-hover:scale-110 transition-transform">
                   <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <p className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
                   {statsLoading ? "..." : (stats && "approvedEvents" in stats ? stats.approvedEvents : 0)}
                 </p>
-                <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Approved</p>
+                <p className="text-xs font-semibold text-text-secondary mt-0.5">Approved</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-amber-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-amber-200/60 dark:border-amber-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-500/40 transition-all group">
-                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-500/30 group-hover:scale-110 transition-transform">
+              <div className="p-4 rounded-2xl bg-bg-surface border border-amber-500/30 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-amber-500/60 transition-all group">
+                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-amber-500/15 text-amber-500 border border-amber-500/30 group-hover:scale-110 transition-transform">
                   <Clock className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <p className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
                   {statsLoading ? "..." : (stats && "pendingEvents" in stats ? stats.pendingEvents : 0)}
                 </p>
-                <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Pending Review</p>
+                <p className="text-xs font-semibold text-text-secondary mt-0.5">Pending Review</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gradient-to-b from-white to-rose-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-rose-200/60 dark:border-rose-500/20 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-rose-300 dark:hover:border-rose-500/40 transition-all group">
-                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-rose-500/10 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-500/30 group-hover:scale-110 transition-transform">
+              <div className="p-4 rounded-2xl bg-bg-surface border border-danger/30 backdrop-blur text-center shadow-xs hover:shadow-md hover:border-danger/60 transition-all group">
+                <div className="inline-flex items-center justify-center w-10 h-10 mb-2 rounded-xl bg-danger/15 text-danger border border-danger/30 group-hover:scale-110 transition-transform">
                   <AlertCircle className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <p className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
                   {statsLoading ? "..." : (stats && "rejectedEvents" in stats ? stats.rejectedEvents : 0)}
                 </p>
-                <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mt-0.5">Rejected</p>
+                <p className="text-xs font-semibold text-text-secondary mt-0.5">Rejected</p>
               </div>
             </div>
           ) : (
             // User / Admin Stats (2 cards)
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-5 rounded-2xl bg-gradient-to-b from-white to-orange-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-orange-200/60 dark:border-orange-500/20 backdrop-blur flex items-center gap-4 shadow-xs hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/80 dark:border-orange-500/30 group-hover:scale-105 transition-transform shrink-0">
+              <div className="p-5 rounded-2xl bg-bg-surface border border-accent/30 backdrop-blur flex items-center gap-4 shadow-xs hover:shadow-md hover:border-accent/60 transition-all group">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/15 text-accent border border-accent/30 group-hover:scale-105 transition-transform shrink-0">
                   <Bookmark className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                  <p className="text-3xl font-extrabold text-text-primary tracking-tight">
                     {statsLoading ? "..." : (stats && "savedEventsCount" in stats ? stats.savedEventsCount : 0)}
                   </p>
-                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Events Saved / Bookmarked</p>
+                  <p className="text-sm font-medium text-text-secondary">Events Saved / Bookmarked</p>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-gradient-to-b from-white to-emerald-50/50 dark:from-neutral-900/90 dark:to-neutral-900/70 border border-emerald-200/60 dark:border-emerald-500/20 backdrop-blur flex items-center gap-4 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-all group">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-500/30 group-hover:scale-105 transition-transform shrink-0">
+              <div className="p-5 rounded-2xl bg-bg-surface border border-success/30 backdrop-blur flex items-center gap-4 shadow-xs hover:shadow-md hover:border-success/60 transition-all group">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-success/15 text-success border border-success/30 group-hover:scale-105 transition-transform shrink-0">
                   <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                  <p className="text-3xl font-extrabold text-text-primary tracking-tight">
                     {statsLoading ? "..." : (stats && "registeredEventsCount" in stats ? stats.registeredEventsCount : 0)}
                   </p>
-                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Events Confirmed Registered</p>
+                  <p className="text-sm font-medium text-text-secondary">Events Confirmed Registered</p>
                 </div>
               </div>
             </div>
@@ -429,27 +429,27 @@ export function ProfileClient() {
         </section>
 
         {/* EDITABLE PROFILE FIELDS CARD */}
-        <Card className="p-6 sm:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-4">
-            <div className="p-2 rounded-lg bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400">
+        <Card className="p-6 sm:p-8 shadow-sm border-border-default bg-bg-surface">
+          <div className="flex items-center gap-3 mb-6 border-b border-border-default pb-4">
+            <div className="p-2 rounded-lg bg-accent/15 text-accent">
               <User className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Personal Information</h2>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Update your profile details and background</p>
+              <h2 className="text-xl font-bold text-text-primary">Personal Information</h2>
+              <p className="text-xs text-text-secondary">Update your profile details and background</p>
             </div>
           </div>
 
           {profileSuccess && (
-            <div className="mb-6 rounded-lg border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="mb-6 rounded-lg border border-success/40 bg-success/15 px-4 py-3 text-sm text-success flex items-center gap-2">
+              <Check className="w-4 h-4 text-success shrink-0" />
               <span>{profileSuccess}</span>
             </div>
           )}
 
           {profileError && (
-            <div className="mb-6 rounded-lg border border-rose-300 bg-rose-50 dark:bg-rose-950/40 px-4 py-3 text-sm text-rose-800 dark:text-rose-300 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <div className="mb-6 rounded-lg border border-danger/40 bg-danger/15 px-4 py-3 text-sm text-danger flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-danger shrink-0" />
               <span>{profileError}</span>
             </div>
           )}
@@ -468,9 +468,9 @@ export function ProfileClient() {
 
               {/* Email (Locked / Read-only) */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="email" className="text-sm font-medium text-neutral-900 dark:text-neutral-200 flex items-center justify-between">
+                <label htmlFor="email" className="text-sm font-medium text-text-primary flex items-center justify-between">
                   <span>Email Address</span>
-                  <span className="text-xs text-neutral-400 dark:text-neutral-500 flex items-center gap-1">
+                  <span className="text-xs text-text-muted flex items-center gap-1">
                     <Lock className="w-3 h-3" /> Locked
                   </span>
                 </label>
@@ -481,9 +481,9 @@ export function ProfileClient() {
                   disabled
                   readOnly
                   aria-label="Email address (cannot be changed)"
-                  className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/80 dark:bg-neutral-900/60 px-3 h-10 text-sm text-neutral-500 dark:text-neutral-400 cursor-not-allowed select-none"
+                  className="w-full rounded-lg border border-border-default bg-bg-surface-secondary px-3 h-10 text-sm text-text-muted cursor-not-allowed select-none"
                 />
-                <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                <p className="text-xs text-text-muted">
                   Email is your primary login identifier and cannot be changed.
                 </p>
               </div>
@@ -534,27 +534,27 @@ export function ProfileClient() {
         </Card>
 
         {/* CHANGE PASSWORD CARD */}
-        <Card className="p-6 sm:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-4">
-            <div className="p-2 rounded-lg bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400">
+        <Card className="p-6 sm:p-8 shadow-sm border-border-default bg-bg-surface">
+          <div className="flex items-center gap-3 mb-6 border-b border-border-default pb-4">
+            <div className="p-2 rounded-lg bg-accent/15 text-accent">
               <Lock className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Security & Password</h2>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Change your password to keep your account safe</p>
+              <h2 className="text-xl font-bold text-text-primary">Security & Password</h2>
+              <p className="text-xs text-text-secondary">Change your password to keep your account safe</p>
             </div>
           </div>
 
           {passwordSuccess && (
-            <div className="mb-6 rounded-lg border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="mb-6 rounded-lg border border-success/40 bg-success/15 px-4 py-3 text-sm text-success flex items-center gap-2">
+              <Check className="w-4 h-4 text-success shrink-0" />
               <span>{passwordSuccess}</span>
             </div>
           )}
 
           {passwordError && (
-            <div className="mb-6 rounded-lg border border-rose-300 bg-rose-50 dark:bg-rose-950/40 px-4 py-3 text-sm text-rose-800 dark:text-rose-300 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <div className="mb-6 rounded-lg border border-danger/40 bg-danger/15 px-4 py-3 text-sm text-danger flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-danger shrink-0" />
               <span>{passwordError}</span>
             </div>
           )}
@@ -611,14 +611,14 @@ export function ProfileClient() {
         </Card>
 
         {/* ACCOUNT LOGOUT */}
-        <div className="pt-2 pb-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-neutral-200 dark:border-neutral-800">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center sm:text-left">
+        <div className="pt-2 pb-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border-default">
+          <p className="text-xs text-text-muted text-center sm:text-left">
             Ready to end your session? You can always log back in at any time.
           </p>
           <Button
             variant="secondary"
             onClick={handleLogout}
-            className="border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-700 dark:hover:text-rose-300 shrink-0"
+            className="border-danger/40 text-danger hover:bg-danger/15 shrink-0"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Sign Out of Khoj

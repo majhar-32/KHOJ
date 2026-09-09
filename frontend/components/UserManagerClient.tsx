@@ -90,12 +90,12 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
   return (
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">User Management</h1>
-        <p className="text-neutral-600">Search, filter, and manage platform users and administrator permissions.</p>
+        <h1 className="text-3xl font-bold text-text-primary mb-2">User Management</h1>
+        <p className="text-text-secondary">Search, filter, and manage platform users and administrator permissions.</p>
       </div>
 
       {error && (
-        <div className="mb-6 rounded-lg border border-error-300 bg-error-50 px-4 py-3 text-sm text-error-700">
+        <div className="mb-6 rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
           {error}
         </div>
       )}
@@ -104,7 +104,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-neutral-400" aria-hidden="true" />
+            <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
           </div>
           <input
             type="search"
@@ -112,14 +112,14 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
             placeholder="Search by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="block w-full pl-9 pr-4 py-2.5 rounded-lg border border-neutral-300 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-600"
+            className="block w-full pl-9 pr-4 py-2.5 rounded-lg border border-border-strong bg-bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
         <select
           aria-label="Filter by role"
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value as typeof filterRole)}
-          className="h-10 rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-600"
+          className="h-10 rounded-lg border border-border-strong bg-bg-surface px-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="all">All Roles</option>
           <option value="user">User</option>
@@ -130,7 +130,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
           aria-label="Filter by status"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
-          className="h-10 rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-600"
+          className="h-10 rounded-lg border border-border-strong bg-bg-surface px-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="all">All Statuses</option>
           <option value="active">Active</option>
@@ -140,8 +140,8 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
 
       <Card padded={false} className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-neutral-600">
-            <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-900">
+          <table className="w-full text-left text-sm text-text-secondary">
+            <thead className="bg-bg-surface-secondary border-b border-border-default text-text-primary">
               <tr>
                 <th className="px-6 py-4 font-medium">Name</th>
                 <th className="px-6 py-4 font-medium">Email</th>
@@ -152,7 +152,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 bg-white">
+            <tbody className="divide-y divide-border-default bg-bg-surface">
               {loading ? (
                 <>
                   <TableRowSkeleton cols={7} />
@@ -162,8 +162,8 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
-                    <p className="text-lg font-medium text-neutral-900 mb-1">No users found</p>
-                    <p className="text-sm text-neutral-500">Try adjusting your search or filters.</p>
+                    <p className="text-lg font-medium text-text-primary mb-1">No users found</p>
+                    <p className="text-sm text-text-muted">Try adjusting your search or filters.</p>
                   </td>
                 </tr>
               ) : (
@@ -172,15 +172,15 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                   const isAdmin = user.role === "admin";
 
                   return (
-                    <tr key={user.id} className="hover:bg-neutral-50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-neutral-900">{user.name}</td>
+                    <tr key={user.id} className="hover:bg-bg-surface-secondary/70 transition-colors">
+                      <td className="px-6 py-4 font-medium text-text-primary">{user.name}</td>
                       <td className="px-6 py-4">{user.email}</td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${isAdmin
-                            ? "bg-purple-100 text-purple-700 border border-purple-200"
+                            ? "bg-accent/15 text-accent border border-accent/30"
                             : user.role === "organizer"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-neutral-100 text-neutral-700"
+                              ? "bg-blue-500/15 text-blue-500 border border-blue-500/30"
+                              : "bg-bg-surface-secondary text-text-secondary border border-border-default"
                           }`}>
                           {isAdmin && <ShieldAlert className="w-3 h-3" />}
                           {user.role.toUpperCase()}
@@ -188,31 +188,31 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                       </td>
                       <td className="px-6 py-4">
                         {user.verified ? (
-                          <span className="inline-flex items-center gap-1 text-success-600 text-xs font-medium">
+                          <span className="inline-flex items-center gap-1 text-success text-xs font-medium">
                             <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
                             Verified
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-neutral-400 text-xs">
+                          <span className="inline-flex items-center gap-1 text-text-muted text-xs">
                             <ShieldOff className="w-3.5 h-3.5" aria-hidden="true" />
                             Unverified
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-neutral-500">
+                      <td className="px-6 py-4 text-text-muted">
                         {new Date(user.joinedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${user.status === "active"
-                            ? "bg-success-50 text-success-700"
-                            : "bg-error-50 text-error-700"
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${user.status === "active"
+                            ? "bg-success/15 text-success border-success/30"
+                            : "bg-danger/15 text-danger border-danger/30"
                           }`}>
                           {user.status === "active" ? "Active" : "Suspended"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         {isSelf ? (
-                          <span className="text-xs text-neutral-400 font-medium px-2.5 py-1 bg-neutral-100 rounded-md">
+                          <span className="text-xs text-text-muted font-medium px-2.5 py-1 bg-bg-surface-secondary border border-border-default rounded-md">
                             You (Admin)
                           </span>
                         ) : (
@@ -222,7 +222,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="text-xs text-amber-700 hover:bg-amber-50"
+                                className="text-xs text-warning hover:bg-warning/15"
                                 onClick={() => setModalState({ user, action: "demote" })}
                                 title="Demote to standard user"
                               >
@@ -233,11 +233,11 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                className="text-xs text-purple-700 hover:bg-purple-50 hover:border-purple-200"
+                                className="text-xs text-accent hover:bg-accent/15 hover:border-accent/30"
                                 onClick={() => setModalState({ user, action: "promote" })}
                                 title="Promote to administrator"
                               >
-                                <ArrowUpRight className="w-3.5 h-3.5 mr-1 text-purple-600" />
+                                <ArrowUpRight className="w-3.5 h-3.5 mr-1 text-accent" />
                                 Promote
                               </Button>
                             )}
@@ -301,7 +301,7 @@ export function UserManagerClient({ initialUsers = [] }: { initialUsers?: KhojUs
           </>
         }
       >
-        <div className="text-sm text-neutral-600 space-y-2">
+        <div className="text-sm text-text-secondary space-y-2">
           {modalState?.action === "promote" && (
             <p>
               Are you sure you want to promote <strong>{modalState.user.name}</strong> ({modalState.user.email}) to an <strong>Admin</strong>? They will gain administrative privileges, including access to user management and review queues.

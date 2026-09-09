@@ -149,7 +149,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
 
       <div className="max-w-[1024px] mx-auto px-4 sm:px-6 -mt-16 md:-mt-24 relative z-10">
 
-        <Card className="p-6 sm:p-8 shadow-sm mb-8">
+        <Card className="p-6 sm:p-8 shadow-sm mb-8 border-border-default bg-bg-surface">
           <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -157,17 +157,17 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                 <StatusChip status={event.status} />
                 <DeadlineBadge daysLeft={daysLeft} />
                 {registered && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-sm">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-success text-white shadow-sm">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Registered
                   </span>
                 )}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-2">{event.name}</h1>
-              <p className="text-lg text-neutral-600 dark:text-neutral-300">
-                Organized by <span className="font-semibold text-neutral-900 dark:text-white">{event.organizerName}</span>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary mb-2 tracking-tight">{event.name}</h1>
+              <p className="text-lg text-text-secondary">
+                Organized by <span className="font-semibold text-text-primary">{event.organizerName}</span>
                 {event.organizerVerified && (
-                  <span className="ml-1 inline-flex items-center text-primary-600" title="Verified Organizer">✓</span>
+                  <span className="ml-1 inline-flex items-center text-accent" title="Verified Organizer">✓</span>
                 )}
               </p>
             </div>
@@ -187,11 +187,11 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                   disabled={isRegistering}
                   className={`w-full font-medium ${
                     registered
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100"
-                      : "bg-white dark:bg-neutral-800"
+                      ? "bg-success/15 text-success border-success/30 hover:bg-success/20"
+                      : "bg-bg-surface text-text-primary"
                   }`}
                 >
-                  <CheckCircle2 className={`w-4 h-4 mr-2 ${registered ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-400"}`} />
+                  <CheckCircle2 className={`w-4 h-4 mr-2 ${registered ? "text-success" : "text-text-muted"}`} />
                   {registered ? "Registered (Confirmed)" : "Mark as Registered"}
                 </Button>
               )}
@@ -200,12 +200,12 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                   <Button
                     size="lg"
                     variant="secondary"
-                    className="flex-1 bg-white dark:bg-neutral-800"
+                    className="flex-1 bg-bg-surface text-text-primary"
                     onClick={handleSave}
                     aria-label={saved ? "Remove from saved" : "Save event"}
                   >
                     <Bookmark
-                      className={`w-4 h-4 mr-2 ${saved ? "fill-primary-600 text-primary-600" : ""}`}
+                      className={`w-4 h-4 mr-2 ${saved ? "fill-accent text-accent" : ""}`}
                       aria-hidden="true"
                     />
                     {saved ? "Saved" : "Save"}
@@ -214,7 +214,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                 <Button
                   size="lg"
                   variant="secondary"
-                  className={`bg-white dark:bg-neutral-800 ${!isAuthenticated ? "flex-1" : ""}`}
+                  className={`bg-bg-surface text-text-primary ${!isAuthenticated ? "flex-1" : ""}`}
                   onClick={() => setShareOpen(true)}
                   aria-label="Share event"
                 >
@@ -229,85 +229,85 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <section>
-              <h2 className="text-xl font-bold text-neutral-900 mb-4">About this event</h2>
-              <div className="text-neutral-700 whitespace-pre-wrap leading-relaxed">{event.description}</div>
+              <h2 className="text-xl font-bold text-text-primary mb-4">About this event</h2>
+              <div className="text-text-secondary whitespace-pre-wrap leading-relaxed">{event.description}</div>
             </section>
             {event.rules && (
               <section>
-                <h2 className="text-xl font-bold text-neutral-900 mb-4">Rules &amp; Guidelines</h2>
-                <div className="bg-white rounded-xl border border-neutral-200 p-5 text-neutral-700 whitespace-pre-wrap leading-relaxed">
+                <h2 className="text-xl font-bold text-text-primary mb-4">Rules &amp; Guidelines</h2>
+                <div className="bg-bg-surface rounded-2xl border border-border-default p-6 text-text-secondary whitespace-pre-wrap leading-relaxed shadow-xs">
                   {event.rules}
                 </div>
               </section>
             )}
             {event.eligibility && (
               <section>
-                <h2 className="text-xl font-bold text-neutral-900 mb-4">Eligibility</h2>
-                <p className="text-neutral-700">{event.eligibility}</p>
+                <h2 className="text-xl font-bold text-text-primary mb-4">Eligibility</h2>
+                <p className="text-text-secondary leading-relaxed">{event.eligibility}</p>
               </section>
             )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <Card className="p-5">
-              <h3 className="font-bold text-neutral-900 mb-4">Event Details</h3>
-              <ul className="space-y-4 text-sm text-neutral-700">
+            <Card className="p-5 border-border-default bg-bg-surface">
+              <h3 className="font-bold text-text-primary mb-4">Event Details</h3>
+              <ul className="space-y-4 text-sm text-text-secondary">
                 <li className="flex gap-3">
-                  <Calendar className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                  <Calendar className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                   <div>
-                    <p className="font-medium text-neutral-900">Date</p>
+                    <p className="font-semibold text-text-primary">Date</p>
                     <p>{new Date(event.eventDate).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
-                  <Clock className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                  <Clock className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                   <div>
-                    <p className="font-medium text-neutral-900">Time</p>
+                    <p className="font-semibold text-text-primary">Time</p>
                     <p>{event.eventTime}</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
                   {event.mode === "online" ? (
-                    <Monitor className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                    <Monitor className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                   ) : (
-                    <MapPin className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                    <MapPin className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                   )}
                   <div>
-                    <p className="font-medium text-neutral-900">Location</p>
+                    <p className="font-semibold text-text-primary">Location</p>
                     <p>{event.mode === "online" ? "Online" : `${event.venue}, ${event.city}`}</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
-                  <Ticket className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                  <Ticket className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                   <div>
-                    <p className="font-medium text-neutral-900">Registration Fee</p>
+                    <p className="font-semibold text-text-primary">Registration Fee</p>
                     <p>{event.registrationFee}</p>
                   </div>
                 </li>
                 {event.prizePool && (
                   <li className="flex gap-3">
-                    <Trophy className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                    <Trophy className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                     <div>
-                      <p className="font-medium text-neutral-900">Prize Pool</p>
+                      <p className="font-semibold text-text-primary">Prize Pool</p>
                       <p>{event.prizePool}</p>
                     </div>
                   </li>
                 )}
                 {event.teamSize && (
                   <li className="flex gap-3">
-                    <Users className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                    <Users className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                     <div>
-                      <p className="font-medium text-neutral-900">Team Size</p>
+                      <p className="font-semibold text-text-primary">Team Size</p>
                       <p>{event.teamSize}</p>
                     </div>
                   </li>
                 )}
                 {event.certificateInfo && (
                   <li className="flex gap-3">
-                    <Award className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
+                    <Award className="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
                     <div>
-                      <p className="font-medium text-neutral-900">Certificate</p>
+                      <p className="font-semibold text-text-primary">Certificate</p>
                       <p>{event.certificateInfo}</p>
                     </div>
                   </li>
@@ -315,15 +315,15 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
               </ul>
             </Card>
 
-            <Card className="p-5">
-              <h3 className="font-bold text-neutral-900 mb-4">Contact Organizer</h3>
-              <div className="text-sm text-neutral-700 whitespace-pre-wrap">{event.contactInfo}</div>
+            <Card className="p-5 border-border-default bg-bg-surface">
+              <h3 className="font-bold text-text-primary mb-4">Contact Organizer</h3>
+              <div className="text-sm text-text-secondary whitespace-pre-wrap">{event.contactInfo}</div>
               {event.officialWebsite && (
                 <Link
                   href={event.officialWebsite}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center text-primary-600 hover:text-primary-700 font-medium text-sm"
+                  className="mt-4 inline-flex items-center text-accent hover:underline font-semibold text-sm"
                 >
                   Visit Official Website
                   <ExternalLink className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
@@ -335,7 +335,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
       </div>
 
       {/* Mobile Sticky Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 md:hidden z-50 flex gap-2">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-bg-surface/95 backdrop-blur border-t border-border-default md:hidden z-50 flex gap-2">
         <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
           <Button className="w-full" size="lg">Register Now</Button>
         </Link>
@@ -347,12 +347,12 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
               onClick={handleToggleRegister}
               disabled={isRegistering}
               aria-label={registered ? "Registered" : "Mark as Registered"}
-              className={registered ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 border-emerald-300" : "bg-white dark:bg-neutral-800"}
+              className={registered ? "bg-success/15 text-success border-success/30" : "bg-bg-surface text-text-primary"}
             >
-              <CheckCircle2 className={`w-5 h-5 ${registered ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-400"}`} aria-hidden="true" />
+              <CheckCircle2 className={`w-5 h-5 ${registered ? "text-success" : "text-text-muted"}`} aria-hidden="true" />
             </Button>
-            <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-white dark:bg-neutral-800">
-              <Bookmark className={`w-5 h-5 ${saved ? "fill-primary-600 text-primary-600" : ""}`} aria-hidden="true" />
+            <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-bg-surface text-text-primary">
+              <Bookmark className={`w-5 h-5 ${saved ? "fill-accent text-accent" : ""}`} aria-hidden="true" />
             </Button>
           </>
         )}

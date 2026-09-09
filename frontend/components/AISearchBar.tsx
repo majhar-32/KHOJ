@@ -60,9 +60,9 @@ export function AISearchBar({
     <form role="search" onSubmit={handleSearch} className={className}>
       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
         {isSearching ? (
-          <Sparkles className="h-5 w-5 text-primary-500 animate-pulse" aria-hidden="true" />
+          <Sparkles className="h-5 w-5 text-accent animate-pulse" aria-hidden="true" />
         ) : (
-          <Search className="h-5 w-5 text-neutral-400" aria-hidden="true" />
+          <Search className="h-5 w-5 text-text-muted" aria-hidden="true" />
         )}
       </div>
       <input
@@ -72,7 +72,7 @@ export function AISearchBar({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         disabled={isSearching}
-        className={`block w-full pl-11 pr-4 rounded-xl border border-neutral-300 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-neutral-900 disabled:opacity-70 disabled:bg-neutral-50 ${inputClassName}`}
+        className={`block w-full pl-11 pr-4 rounded-xl border border-border-strong bg-bg-surface text-text-primary placeholder:text-text-muted shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all disabled:opacity-70 disabled:bg-bg-surface-secondary ${inputClassName}`}
       />
     </form>
   );

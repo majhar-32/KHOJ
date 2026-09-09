@@ -2,21 +2,63 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
-  --card-bg: #ffffff;
-  --card-border: #e5e7eb;
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --nav-border: rgba(209, 213, 219, 0.7);
+  /* Semantic Tokens - Light Mode */
+  --bg-page: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-secondary: #F1F5F9;
+  
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  
+  --border-default: #E2E8F0;
+  --border-strong: #CBD5E1;
+  
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --info: #0284C7;
+
+  /* Legacy mappings for backward compatibility */
+  --background: var(--bg-page);
+  --foreground: var(--text-primary);
+  --card-bg: var(--bg-surface);
+  --card-border: var(--border-default);
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --nav-border: var(--border-default);
 }
 
 .dark {
-  --background: #0b0f19;
-  --foreground: #f3f4f6;
-  --card-bg: #111827;
-  --card-border: #1f2937;
-  --nav-bg: rgba(17, 24, 39, 0.9);
-  --nav-border: #1f2937;
+  /* Semantic Tokens - Dark Mode (Rich Deep Charcoal Navy, high contrast, readable) */
+  --bg-page: #0B0F19;
+  --bg-surface: #141C2E;
+  --bg-surface-secondary: #1E293B;
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  
+  --border-default: #222F46;
+  --border-strong: #384B6E;
+  
+  --accent: #3B82F6;
+  --accent-hover: #60A5FA;
+  
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: #38BDF8;
+
+  /* Legacy mappings for backward compatibility */
+  --background: var(--bg-page);
+  --foreground: var(--text-primary);
+  --card-bg: var(--bg-surface);
+  --card-border: var(--border-default);
+  --nav-bg: rgba(15, 23, 42, 0.95);
+  --nav-border: var(--border-default);
 }
 
 @theme inline {
@@ -24,7 +66,31 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
 
-  /* Khoj design system — primary */
+  /* Semantic Color Tokens */
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-secondary: var(--bg-surface-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  /* Semantic Short Utilities */
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-surface-secondary: var(--bg-surface-secondary);
+  --color-primary-text: var(--text-primary);
+  --color-secondary-text: var(--text-secondary);
+  --color-muted-text: var(--text-muted);
+
+  /* Khoj design system — primary shades */
   --color-primary-50: #EEF2FF;
   --color-primary-100: #E0E7FF;
   --color-primary-200: #C7D2FE;
@@ -37,11 +103,11 @@
   --color-primary-900: #1E3A8A;
   --color-primary-950: #0F172A;
 
-  /* accent (deadlines / urgency) */
+  /* accent (urgency) */
   --color-accent-amber-50: #FFF7E8;
   --color-accent-amber-500: #F5A524;
 
-  /* semantic */
+  /* semantic feedback */
   --color-success-50: #EAFBF1;
   --color-success-500: #22C55E;
   --color-warning-50: #FEF6E7;

@@ -19,8 +19,8 @@ export default async function BrowseEventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <Suspense fallback={<div className="p-8 text-center">Loading events...</div>}>
+    <div className="min-h-screen bg-bg-page text-text-primary transition-colors">
+      <Suspense fallback={<div className="p-8 text-center text-text-muted">Loading events...</div>}>
         <BrowseEventsClient initialEvents={events} categories={categories} />
       </Suspense>
     </div>

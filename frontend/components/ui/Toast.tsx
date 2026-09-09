@@ -18,7 +18,7 @@ export function Toast({ message, onDismiss, duration = 2000 }: ToastProps) {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 rounded-full bg-neutral-900 text-white text-sm font-medium px-4 py-2 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200"
+      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 rounded-full bg-text-primary text-bg-surface text-sm font-semibold px-5 py-2.5 shadow-xl border border-border-strong animate-in fade-in slide-in-from-bottom-2 duration-200"
     >
       {message}
     </div>

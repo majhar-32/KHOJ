@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 export default function AdminDashboardPage() {
   return (
-    <div className="min-h-screen bg-neutral-50 pb-20">
+    <div className="min-h-screen bg-bg-page text-text-primary pb-20">
       <AdminDashboardClient />
     </div>
   );
