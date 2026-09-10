@@ -125,135 +125,164 @@ export function EventCard({
     }
   };
 
-  return (
-    <>
-      <Link
-        href={`/events/${event.id}`}
-        onClick={handleCardClick}
-        className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl"
+  const isDeadlinePassed = daysLeft <= 0;
+
+  const cardContent = (
+    <Card
+      padded={false}
+      className={`h-full flex flex-col overflow-hidden border-border-default bg-bg-surface transition-all ${
+        isDeadlinePassed
+          ? "opacity-60 cursor-not-allowed"
+          : "hover:shadow-lg group"
+      }`}
+    >
+      {/* Banner Container */}
+      <div
+        className={`h-32 w-full shrink-0 relative p-4 flex flex-col justify-between overflow-hidden ${
+          !event.bannerImageUrl
+            ? bannerToneClasses[event.bannerColor] || bannerToneClasses.default
+            : "bg-bg-surface-secondary"
+        }`}
       >
-        <Card
-          padded={false}
-          className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all group border-border-default bg-bg-surface"
-        >
-          {/* Banner Container */}
-          <div
-            className={`h-32 w-full shrink-0 relative p-4 flex flex-col justify-between overflow-hidden ${
-              !event.bannerImageUrl
-                ? bannerToneClasses[event.bannerColor] || bannerToneClasses.default
-                : "bg-bg-surface-secondary"
-            }`}
-          >
-            {event.bannerImageUrl && (
-              <>
-                <img
-                  src={event.bannerImageUrl}
-                  alt={event.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
-              </>
-            )}
+        {event.bannerImageUrl && (
+          <>
+            <img
+              src={event.bannerImageUrl}
+              alt={event.name}
+              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-300 ${
+                isDeadlinePassed ? "" : "group-hover:scale-105"
+              }`}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
+          </>
+        )}
 
-            <div className="relative z-10 flex justify-between items-start gap-2">
-              <CategoryTag label={event.category} />
-              <div className="flex items-center gap-1">
-                {showStatus && <StatusChip status={event.status} />}
-                <button
-                  onClick={handleSave}
-                  aria-label={
+        <div className="relative z-10 flex justify-between items-start gap-2">
+          <CategoryTag label={event.category} />
+          <div className="flex items-center gap-1">
+            {showStatus && <StatusChip status={event.status} />}
+            {!isDeadlinePassed && (
+              <button
+                onClick={handleSave}
+                aria-label={
+                  saved
+                    ? `Remove ${event.name} from saved`
+                    : `Save ${event.name}`
+                }
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-bg-surface/90 hover:bg-bg-surface shadow-sm border border-border-default transition-colors cursor-pointer"
+              >
+                <Bookmark
+                  className={`h-4 w-4 ${
                     saved
-                      ? `Remove ${event.name} from saved`
-                      : `Save ${event.name}`
-                  }
-                  className="h-8 w-8 flex items-center justify-center rounded-full bg-bg-surface/90 hover:bg-bg-surface shadow-sm border border-border-default transition-colors"
-                >
-                  <Bookmark
-                    className={`h-4 w-4 ${
-                      saved
-                        ? "fill-accent text-accent"
-                        : "text-text-secondary"
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
+                      ? "fill-accent text-accent"
+                      : "text-text-secondary"
+                  }`}
+                />
+              </button>
+            )}
+          </div>
+        </div>
 
-            <div className="relative z-10 self-start flex items-center gap-1.5 flex-wrap">
-              <DeadlineBadge daysLeft={daysLeft} />
-              {registered && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success text-white shadow-sm">
-                  <CheckCircle2 className="w-3 h-3" />
-                  Registered
-                </span>
-              )}
-            </div>
+        <div className="relative z-10 self-start flex items-center gap-1.5 flex-wrap">
+          <DeadlineBadge daysLeft={daysLeft} />
+          {registered && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success text-white shadow-sm">
+              <CheckCircle2 className="w-3 h-3" />
+              Registered
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="p-4 flex flex-col flex-grow">
+        <h3
+          className={`font-bold text-text-primary line-clamp-2 text-lg mb-1 transition-colors ${
+            isDeadlinePassed ? "" : "group-hover:text-accent"
+          }`}
+        >
+          {event.name}
+        </h3>
+        <p className="text-sm text-text-secondary mb-4 line-clamp-1">
+          by {event.organizerName}
+        </p>
+
+        <div className="mt-auto space-y-2 text-sm text-text-secondary">
+          <div className="flex items-center gap-2">
+            <Ticket
+              className="w-4 h-4 shrink-0 text-text-muted"
+              aria-hidden="true"
+            />
+            <span className="truncate">{event.registrationFee}</span>
           </div>
 
-          <div className="p-4 flex flex-col flex-grow">
-            <h3 className="font-bold text-text-primary line-clamp-2 text-lg mb-1 group-hover:text-accent transition-colors">
-              {event.name}
-            </h3>
-            <p className="text-sm text-text-secondary mb-4 line-clamp-1">
-              by {event.organizerName}
-            </p>
-
-            <div className="mt-auto space-y-2 text-sm text-text-secondary">
-              <div className="flex items-center gap-2">
-                <Ticket
+          <div className="flex items-center gap-2">
+            {event.mode === "online" ? (
+              <>
+                <Monitor
                   className="w-4 h-4 shrink-0 text-text-muted"
                   aria-hidden="true"
                 />
-                <span className="truncate">{event.registrationFee}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {event.mode === "online" ? (
-                  <>
-                    <Monitor
-                      className="w-4 h-4 shrink-0 text-text-muted"
-                      aria-hidden="true"
-                    />
-                    <span>Online</span>
-                  </>
-                ) : (
-                  <>
-                    <MapPin
-                      className="w-4 h-4 shrink-0 text-text-muted"
-                      aria-hidden="true"
-                    />
-                    <span className="truncate">{event.city}</span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {showRegisterToggle && (
-              <div className="mt-4 pt-3 border-t border-border-default">
-                <button
-                  type="button"
-                  onClick={handleToggleRegister}
-                  disabled={isRegistering}
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                    registered
-                      ? "bg-success/15 text-success border border-success/30 hover:bg-success/20"
-                      : "bg-bg-surface-secondary text-text-primary hover:bg-border-default border border-border-default"
-                  }`}
-                >
-                  <CheckCircle2
-                    className={`w-3.5 h-3.5 ${
-                      registered
-                        ? "text-success"
-                        : "text-text-muted"
-                    }`}
-                  />
-                  {registered ? "Registered (Confirmed)" : "Mark as Registered"}
-                </button>
-              </div>
+                <span>Online</span>
+              </>
+            ) : (
+              <>
+                <MapPin
+                  className="w-4 h-4 shrink-0 text-text-muted"
+                  aria-hidden="true"
+                />
+                <span className="truncate">{event.city}</span>
+              </>
             )}
           </div>
-        </Card>
-      </Link>
+        </div>
+
+        {showRegisterToggle && (
+          <div className="mt-4 pt-3 border-t border-border-default">
+            <button
+              type="button"
+              onClick={handleToggleRegister}
+              disabled={isRegistering || isDeadlinePassed}
+              className={`w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                isDeadlinePassed
+                  ? "opacity-60 cursor-not-allowed bg-bg-surface-secondary text-text-muted border border-border-default"
+                  : registered
+                  ? "bg-success/15 text-success border border-success/30 hover:bg-success/20 cursor-pointer"
+                  : "bg-bg-surface-secondary text-text-primary hover:bg-border-default border border-border-default cursor-pointer"
+              }`}
+            >
+              <CheckCircle2
+                className={`w-3.5 h-3.5 ${
+                  registered
+                    ? "text-success"
+                    : "text-text-muted"
+                }`}
+              />
+              {registered ? "Registered ✓" : isDeadlinePassed ? "Registration Closed" : "I've Registered"}
+            </button>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+
+  return (
+    <>
+      {isDeadlinePassed ? (
+        <div
+          className="block h-full cursor-not-allowed select-none"
+          aria-disabled="true"
+        >
+          {cardContent}
+        </div>
+      ) : (
+        <Link
+          href={`/events/${event.id}`}
+          onClick={handleCardClick}
+          className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl"
+        >
+          {cardContent}
+        </Link>
+      )}
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
     </>
   );

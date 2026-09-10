@@ -218,9 +218,17 @@ Rules:
       parsedFilters = {};
     }
 
+    // 3-day grace period cutoff: only show events whose deadline has not passed,
+    // or passed within the last 3 days. Events expired > 3 days ago are excluded from public discovery.
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
     // Build database query
     const where: any = {
       status: EventStatus.APPROVED,
+      registrationDeadline: {
+        gte: threeDaysAgo,
+      },
     };
 
     let hasStructuredFilter = false;
@@ -245,7 +253,7 @@ Rules:
     if (parsedFilters.deadlineBefore) {
       const date = new Date(parsedFilters.deadlineBefore);
       if (!isNaN(date.getTime())) {
-        where.registrationDeadline = { lte: date };
+        where.registrationDeadline = { ...where.registrationDeadline, lte: date };
         hasStructuredFilter = true;
       }
     }
