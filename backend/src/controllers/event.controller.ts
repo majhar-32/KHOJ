@@ -107,8 +107,16 @@ export const getEvents = async (
   try {
     const { category, city, mode, q } = req.query;
 
+    // 3-day grace period cutoff: only show events whose deadline has not passed,
+    // or passed within the last 3 days. Events expired > 3 days ago are excluded from public discovery.
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
     const where: any = {
       status: EventStatus.APPROVED,
+      registrationDeadline: {
+        gte: threeDaysAgo,
+      },
     };
 
     if (category && typeof category === 'string' && category.trim() !== '') {

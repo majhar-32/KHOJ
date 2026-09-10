@@ -27,19 +27,14 @@ const bannerToneClasses: Record<string, string> = {
 
 export function EventDetailsClient({ event }: { event: KhojEvent }) {
   const router = useRouter();
-  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { role, token, isAuthenticated } = useAuth();
+  const isOrganizerOrAdmin = isAuthenticated && (role === "organizer" || role === "admin");
   const [saved, setSaved] = useState(!!event.saved);
   const [registered, setRegistered] = useState(!!event.registered);
   const [isRegistering, setIsRegistering] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     if (isAuthenticated && token) {
@@ -66,7 +61,10 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
   );
 
   const handleSave = async () => {
-    if (!isAuthenticated || !token) return;
+    if (!isAuthenticated || !token) {
+      router.push("/login");
+      return;
+    }
     const nextSaved = !saved;
     setSaved(nextSaved);
     setToast(nextSaved ? "Saved!" : "Removed from saved");
@@ -156,7 +154,7 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
                 <CategoryTag label={event.category} />
                 <StatusChip status={event.status} />
                 <DeadlineBadge daysLeft={daysLeft} />
-                {registered && (
+                {registered && !isOrganizerOrAdmin && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-success text-white shadow-sm">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Registered
@@ -172,55 +170,78 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
               </p>
             </div>
 
-            <div className="flex w-full md:w-auto flex-row md:flex-col gap-3 shrink-0">
-              <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1 md:w-full">
-                <Button size="lg" className="w-full">
-                  Register Now
-                  <ExternalLink className="w-4 h-4 ml-2" aria-hidden="true" />
-                </Button>
-              </Link>
-              {isAuthenticated && (
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  onClick={handleToggleRegister}
-                  disabled={isRegistering}
-                  className={`w-full font-medium ${
-                    registered
-                      ? "bg-success/15 text-success border-success/30 hover:bg-success/20"
-                      : "bg-bg-surface text-text-primary"
-                  }`}
-                >
-                  <CheckCircle2 className={`w-4 h-4 mr-2 ${registered ? "text-success" : "text-text-muted"}`} />
-                  {registered ? "Registered (Confirmed)" : "Mark as Registered"}
-                </Button>
-              )}
-              <div className="flex gap-2">
-                {isAuthenticated && (
+            <div className="flex w-full md:w-64 flex-col gap-3 shrink-0">
+              {isOrganizerOrAdmin ? (
+                <div className="w-full">
                   <Button
                     size="lg"
                     variant="secondary"
-                    className="flex-1 bg-bg-surface text-text-primary"
-                    onClick={handleSave}
-                    aria-label={saved ? "Remove from saved" : "Save event"}
+                    className="w-full bg-bg-surface text-text-primary hover:bg-bg-surface-secondary justify-center"
+                    onClick={() => setShareOpen(true)}
+                    aria-label="Share event"
                   >
-                    <Bookmark
-                      className={`w-4 h-4 mr-2 ${saved ? "fill-accent text-accent" : ""}`}
-                      aria-hidden="true"
-                    />
-                    {saved ? "Saved" : "Save"}
+                    <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+                    Share Event
                   </Button>
-                )}
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className={`bg-bg-surface text-text-primary ${!isAuthenticated ? "flex-1" : ""}`}
-                  onClick={() => setShareOpen(true)}
-                  aria-label="Share event"
-                >
-                  <Share2 className="w-4 h-4" aria-hidden="true" />
-                </Button>
-              </div>
+                </div>
+              ) : (
+                <>
+                  {/* Primary Action: Register Now */}
+                  <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button size="lg" className="w-full">
+                      Register Now
+                      <ExternalLink className="w-4 h-4 ml-2" aria-hidden="true" />
+                    </Button>
+                  </Link>
+
+                  {/* Secondary Self-Tracking Action: I've Registered */}
+                  <div className="w-full">
+                    <Button
+                      size="lg"
+                      variant="secondary"
+                      onClick={handleToggleRegister}
+                      disabled={isRegistering}
+                      className={`w-full font-medium transition-colors ${
+                        registered
+                          ? "bg-success/15 text-success border-success/30 hover:bg-success/20"
+                          : "bg-bg-surface text-text-primary hover:bg-bg-surface-secondary"
+                      }`}
+                    >
+                      <CheckCircle2 className={`w-4 h-4 mr-2 ${registered ? "text-success" : "text-text-muted"}`} />
+                      {registered ? "Registered ✓" : "I've Registered"}
+                    </Button>
+                    <p className="text-[12px] text-text-muted text-center mt-1.5 leading-snug">
+                      Track your own registration status — not verified by Khoj
+                    </p>
+                  </div>
+
+                  {/* Save & Share */}
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      size="lg"
+                      variant="secondary"
+                      className="flex-1 bg-bg-surface text-text-primary hover:bg-bg-surface-secondary"
+                      onClick={handleSave}
+                      aria-label={saved ? "Remove from saved" : "Save event"}
+                    >
+                      <Bookmark
+                        className={`w-4 h-4 mr-2 ${saved ? "fill-accent text-accent" : ""}`}
+                        aria-hidden="true"
+                      />
+                      {saved ? "Saved" : "Save"}
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="secondary"
+                      className="bg-bg-surface text-text-primary hover:bg-bg-surface-secondary"
+                      onClick={() => setShareOpen(true)}
+                      aria-label="Share event"
+                    >
+                      <Share2 className="w-4 h-4" aria-hidden="true" />
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </Card>
@@ -334,29 +355,46 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
         </div>
       </div>
 
-      {/* Mobile Sticky Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-bg-surface/95 backdrop-blur border-t border-border-default md:hidden z-50 flex gap-2">
-        <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
-          <Button className="w-full" size="lg">Register Now</Button>
-        </Link>
-        {isAuthenticated && (
-          <>
+      {/* Mobile Sticky Action Bar (Hidden for Organizer and Admin roles) */}
+      {!isOrganizerOrAdmin && (
+        <div className="fixed bottom-0 left-0 right-0 p-3 bg-bg-surface/95 backdrop-blur border-t border-border-default md:hidden z-50 flex flex-col gap-1.5 shadow-lg">
+          <div className="flex gap-2">
+            <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
+              <Button className="w-full" size="lg">
+                Register Now
+                <ExternalLink className="w-4 h-4 ml-1.5" aria-hidden="true" />
+              </Button>
+            </Link>
             <Button
               variant="secondary"
               size="lg"
               onClick={handleToggleRegister}
               disabled={isRegistering}
-              aria-label={registered ? "Registered" : "Mark as Registered"}
-              className={registered ? "bg-success/15 text-success border-success/30" : "bg-bg-surface text-text-primary"}
+              aria-label={registered ? "Registered ✓" : "I've Registered"}
+              className={`px-3.5 font-medium transition-colors ${
+                registered
+                  ? "bg-success/15 text-success border-success/30"
+                  : "bg-bg-surface text-text-primary hover:bg-bg-surface-secondary"
+              }`}
+              title={registered ? "Registered ✓" : "I've Registered"}
             >
               <CheckCircle2 className={`w-5 h-5 ${registered ? "text-success" : "text-text-muted"}`} aria-hidden="true" />
             </Button>
-            <Button variant="secondary" size="lg" onClick={handleSave} aria-label={saved ? "Remove from saved" : "Save"} className="bg-bg-surface text-text-primary">
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={handleSave}
+              aria-label={saved ? "Remove from saved" : "Save"}
+              className="bg-bg-surface text-text-primary px-3.5 hover:bg-bg-surface-secondary"
+            >
               <Bookmark className={`w-5 h-5 ${saved ? "fill-accent text-accent" : ""}`} aria-hidden="true" />
             </Button>
-          </>
-        )}
-      </div>
+          </div>
+          <p className="text-[11px] text-text-muted text-center leading-tight">
+            Track your own registration status — not verified by Khoj
+          </p>
+        </div>
+      )}
 
       {/* Share Modal */}
       <Modal open={shareOpen} onClose={() => setShareOpen(false)} title="Share this Event">

@@ -138,4 +138,81 @@ describe('Events Endpoints', () => {
     const foundInPublic = publicRes.body.find((e: any) => e.id === createdEventId);
     expect(foundInPublic).toBeUndefined();
   });
+
+  it('GET /api/events includes events with deadline 2 days past, but excludes events with deadline 5 days past', async () => {
+    const category = await prisma.category.findFirst();
+    const organizer = await prisma.user.findFirst({ where: { email: `org1-${timestamp}@example.com` } });
+    if (!category || !organizer) throw new Error('Missing test category or organizer');
+
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+    const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+    const futureDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+
+    // Event within grace period (deadline 2 days ago)
+    const recentExpired = await prisma.event.create({
+      data: {
+        name: `Test Event ${timestamp} - Grace Period 2d`,
+        categoryId: category.id,
+        organizerId: organizer.id,
+        eventDate: futureDate,
+        eventTime: '10:00 AM',
+        venue: 'Test Venue',
+        city: 'Dhaka',
+        mode: 'OFFLINE',
+        registrationDeadline: twoDaysAgo,
+        registrationFee: 'Free',
+        prizePool: '1000',
+        eligibility: 'Everyone',
+        teamSize: '1',
+        certificateInfo: 'None',
+        description: 'Testing 3-day grace period',
+        rules: 'None',
+        contactInfo: 'test@example.com',
+        registrationLink: 'https://example.com',
+        officialWebsite: 'https://example.com',
+        status: 'APPROVED',
+      },
+    });
+
+    // Event past grace period (deadline 5 days ago)
+    const pastGracePeriod = await prisma.event.create({
+      data: {
+        name: `Test Event ${timestamp} - Past Grace Period 5d`,
+        categoryId: category.id,
+        organizerId: organizer.id,
+        eventDate: futureDate,
+        eventTime: '10:00 AM',
+        venue: 'Test Venue',
+        city: 'Dhaka',
+        mode: 'OFFLINE',
+        registrationDeadline: fiveDaysAgo,
+        registrationFee: 'Free',
+        prizePool: '1000',
+        eligibility: 'Everyone',
+        teamSize: '1',
+        certificateInfo: 'None',
+        description: 'Testing past 3-day grace period',
+        rules: 'None',
+        contactInfo: 'test@example.com',
+        registrationLink: 'https://example.com',
+        officialWebsite: 'https://example.com',
+        status: 'APPROVED',
+      },
+    });
+
+    // Public discovery GET /api/events
+    const publicRes = await request(app).get('/api/events');
+    expect(publicRes.status).toBe(200);
+
+    const foundRecent = publicRes.body.find((e: any) => e.id === recentExpired.id);
+    const foundPast = publicRes.body.find((e: any) => e.id === pastGracePeriod.id);
+
+    expect(foundRecent).toBeDefined();
+    expect(foundPast).toBeUndefined();
+
+    // Confirm that getEventById directly still returns the 5-day past event
+    const directRes = await request(app).get(`/api/events/${pastGracePeriod.id}`);
+    expect(directRes.status).toBe(200);
+    expect(directRes.body.id).toBe(pastGracePeriod.id);
+  });
 });
