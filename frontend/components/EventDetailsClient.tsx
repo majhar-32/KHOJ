@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CommentsSection } from "@/components/CommentsSection";
 
 const bannerToneClasses: Record<string, string> = {
   primary: "bg-primary-50",
@@ -353,6 +354,9 @@ export function EventDetailsClient({ event }: { event: KhojEvent }) {
             </Card>
           </div>
         </div>
+        
+        {/* Comments Section */}
+        <CommentsSection eventId={event.id} />
       </div>
 
       {/* Mobile Sticky Action Bar (Hidden for Organizer and Admin roles) */}

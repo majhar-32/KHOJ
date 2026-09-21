@@ -48,6 +48,7 @@ model User {
 
   eventsOrganized Event[]      @relation("OrganizerEvents")
   savedEvents     SavedEvent[]
+  comments        Comment[]
 
   @@map("users")
 }
@@ -91,6 +92,7 @@ model Event {
   updatedAt             DateTime    @updatedAt
 
   savedBy SavedEvent[]
+  comments Comment[]
 
   @@map("events")
 }
@@ -107,4 +109,17 @@ model SavedEvent {
 
   @@unique([userId, eventId])
   @@map("saved_events")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String   @db.Text
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
 }

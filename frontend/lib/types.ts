@@ -56,3 +56,17 @@ export interface KhojCategory {
   id: string;
   name: string;
 }
+
+export interface KhojComment {
+  id: string;
+  text: string;
+  userId: string;
+  eventId: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+    profilePictureUrl: string | null;
+  };
+}
