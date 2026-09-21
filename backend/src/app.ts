@@ -6,6 +6,7 @@ import eventRouter from './routes/event.route';
 import categoryRouter from './routes/category.route';
 import userRouter from './routes/user.route';
 import aiRouter from './routes/ai.route';
+import commentRouter from './routes/comment.route';
 import { notFound } from './middleware/notFound';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -30,6 +31,7 @@ app.use('/api/events', eventRouter);
 app.use('/api/categories', categoryRouter);
 app.use('/api/users', userRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/comments', commentRouter);
 
 // 404 handler for unmatched routes
 app.use(notFound);
