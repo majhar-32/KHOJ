@@ -183,7 +183,7 @@ export function CommentsSection({ eventId }: { eventId: string }) {
         ) : (
           comments.map((comment) => {
             const isOwner = user?.id === comment.userId;
-            const isAdmin = user?.role === "admin";
+            const isAdmin = user?.role === "ADMIN";
             
             return (
               <div key={comment.id} className="flex gap-4 p-4 rounded-xl hover:bg-bg-surface-secondary/50 transition-colors border border-transparent hover:border-border-default">
