@@ -33,7 +33,7 @@ router.get('/saved', authenticate, getSavedEvents);
 router.get('/:id', getEventById);
 
 // Create event (with optional banner upload)
-router.post('/', authenticate, authorize(Role.ORGANIZER), uploadBanner, createEvent);
+router.post('/', authenticate, authorize(Role.ORGANIZER, Role.ADMIN), uploadBanner, createEvent);
 
 // Save / Bookmark toggle
 router.post('/:id/save', authenticate, toggleSaveEvent);

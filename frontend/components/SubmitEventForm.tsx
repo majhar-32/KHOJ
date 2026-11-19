@@ -7,8 +7,9 @@ import { KhojEvent } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { Input, Textarea, Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Sparkles, AlertTriangle } from "lucide-react";
+import { Sparkles, AlertTriangle, AlertCircle, LogIn } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 type FormMode = "create" | "edit";
 
@@ -21,7 +22,7 @@ interface SubmitEventFormProps {
 
 export function SubmitEventForm({ categories, mode = "create", initialData }: SubmitEventFormProps) {
   const router = useRouter();
-  const { token, user } = useAuth();
+  const { token, user, isLoading: authLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -128,6 +129,12 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
     setIsSubmitting(true);
     setFormError(null);
 
+    if (!token) {
+      setFormError("You must be logged in as an Organizer to submit an event. Please log in to continue.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
@@ -166,7 +173,13 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
       router.push("/dashboard/organizer");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setFormError(error.message);
+        if (error.message.toLowerCase().includes("unauthorized")) {
+          setFormError("You are not logged in or your session has expired. Please log in as an Organizer to submit this event.");
+        } else if (error.message.toLowerCase().includes("forbidden")) {
+          setFormError("Only Organizer or Admin accounts have permission to submit events. Please switch to an Organizer account.");
+        } else {
+          setFormError(error.message);
+        }
       } else {
         setFormError("Failed to submit event. Please check all fields.");
       }
@@ -200,9 +213,42 @@ export function SubmitEventForm({ categories, mode = "create", initialData }: Su
         </p>
       </div>
 
+      {!authLoading && !user && (
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-warning/40 bg-warning/10 text-text-primary">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-sm">Organizer Login Required</p>
+              <p className="text-xs text-text-secondary mt-0.5">
+                You can draft or auto-fill with AI right now, but submitting this event requires logging in with an Organizer account.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/login?redirect=/dashboard/organizer/submit"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-text-onPrimary rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity whitespace-nowrap self-end sm:self-auto"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            Log In
+          </Link>
+        </div>
+      )}
+
       {formError && (
-        <div className="mb-6 p-4 rounded-xl border border-danger/30 bg-danger/10 text-danger text-sm">
-          {formError}
+        <div className="mb-6 p-4 rounded-xl border border-danger/30 bg-danger/10 text-danger text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{formError}</span>
+          </div>
+          {(formError.includes("log in") || formError.includes("Organizer")) && !user && (
+            <Link
+              href="/login?redirect=/dashboard/organizer/submit"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-danger/20 hover:bg-danger/30 text-danger font-medium rounded-md text-xs border border-danger/40 transition-colors whitespace-nowrap"
+            >
+              <LogIn className="w-3 h-3" />
+              Go to Login
+            </Link>
+          )}
         </div>
       )}
 
