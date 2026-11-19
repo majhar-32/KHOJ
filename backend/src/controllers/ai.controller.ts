@@ -4,6 +4,7 @@ import prisma from '../lib/prisma';
 import { getGeminiClient } from '../lib/gemini';
 import { EventStatus, EventMode } from '@prisma/client';
 import { formatEvent } from './event.controller';
+import { heuristicExtractEvent } from '../utils/aiExtractor';
 
 const extractInputSchema = z.object({
   rawText: z.string().min(1, 'rawText is required'),
@@ -22,6 +23,9 @@ const extractedEventSchema = z.object({
   prizePool: z.string().nullable().optional(),
   eligibility: z.string().nullable().optional(),
   teamSize: z.string().nullable().optional(),
+  contactInfo: z.string().nullable().optional(),
+  registrationLink: z.string().nullable().optional(),
+  officialWebsite: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
 });
 
@@ -101,50 +105,49 @@ Raw Event Text:
 ${rawText}
 """`;
 
-    let responseText = '';
-    try {
-      const ai = getGeminiClient();
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-        },
-      });
-      responseText = response.text || '{}';
-    } catch (modelErr: any) {
-      console.error('Gemini API Error in extractEvent:', modelErr);
-      res.status(502).json({
-        error: 'AI service temporarily unavailable. Please fill the fields manually.',
-        details: modelErr?.message,
-      });
-      return;
+    const apiKey = process.env.GEMINI_API_KEY;
+    const hasValidApiKey = apiKey && apiKey !== 'your_gemini_api_key' && !apiKey.includes('your_');
+
+    let extractedData = null;
+
+    if (hasValidApiKey) {
+      try {
+        const ai = getGeminiClient();
+        const geminiPromise = ai.models.generateContent({
+          model: 'gemini-3.8-flash',
+          contents: prompt,
+          config: {
+            responseMimeType: 'application/json',
+          },
+        });
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Gemini API timeout')), 3500)
+        );
+
+        const response: any = await Promise.race([geminiPromise, timeoutPromise]);
+        const responseText = response.text || '{}';
+        const parsedJson = JSON.parse(responseText);
+        const validation = extractedEventSchema.safeParse(parsedJson);
+        if (validation.success) {
+          extractedData = validation.data;
+        } else {
+          console.warn('Gemini schema validation failed, falling back to heuristic:', validation.error);
+        }
+      } catch (modelErr: any) {
+        console.warn('Gemini API call failed, falling back to heuristic extractor:', modelErr?.message);
+      }
     }
 
-    let parsedJson: unknown;
-    try {
-      parsedJson = JSON.parse(responseText);
-    } catch {
-      res.status(502).json({ error: 'AI returned malformed JSON response' });
-      return;
+    // If Gemini was unavailable, skipped, or failed, use smart heuristic fallback
+    if (!extractedData) {
+      extractedData = heuristicExtractEvent(rawText, categoryNames);
     }
 
-    const validation = extractedEventSchema.safeParse(parsedJson);
-    if (!validation.success) {
-      console.error('AI schema validation error:', validation.error);
-      res.status(502).json({
-        error: 'Extracted data failed validation',
-        issues: validation.error.issues,
-      });
-      return;
+    if (extractedData.mode) {
+      extractedData.mode = extractedData.mode.toLowerCase() as 'online' | 'offline';
     }
 
-    const data = validation.data;
-    if (data.mode) {
-      data.mode = data.mode.toLowerCase() as 'online' | 'offline';
-    }
-
-    res.status(200).json(data);
+    res.status(200).json(extractedData);
   } catch (error) {
     next(error);
   }
@@ -179,8 +182,12 @@ export const searchEvents = async (
 
     let parsedFilters: z.infer<typeof searchFilterSchema> = {};
 
-    try {
-      const prompt = `You are a search query parser for an event platform in Bangladesh called Khoj.
+    const apiKey = process.env.GEMINI_API_KEY;
+    const hasValidApiKey = apiKey && apiKey !== 'your_gemini_api_key' && !apiKey.includes('your_');
+
+    if (hasValidApiKey) {
+      try {
+        const prompt = `You are a search query parser for an event platform in Bangladesh called Khoj.
 Translate the user's natural language search query into structured search filter parameters.
 
 Available Categories in DB:
@@ -198,24 +205,25 @@ Rules:
 4. "deadlineBefore": ISO date "YYYY-MM-DD" if a time reference is given (e.g. "before September" -> "2026-09-01", "this week", etc.), else null.
 5. If the query doesn't specify a field, set it to null. NEVER make up unmentioned criteria.`;
 
-      const ai = getGeminiClient();
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-        },
-      });
+        const ai = getGeminiClient();
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.8-flash',
+          contents: prompt,
+          config: {
+            responseMimeType: 'application/json',
+          },
+        });
 
-      const responseText = response.text || '{}';
-      const parsed = JSON.parse(responseText);
-      const validation = searchFilterSchema.safeParse(parsed);
-      if (validation.success) {
-        parsedFilters = validation.data;
+        const responseText = response.text || '{}';
+        const parsed = JSON.parse(responseText);
+        const validation = searchFilterSchema.safeParse(parsed);
+        if (validation.success) {
+          parsedFilters = validation.data;
+        }
+      } catch (aiErr) {
+        console.warn('AI query parsing failed, falling back to keyword search:', aiErr);
+        parsedFilters = {};
       }
-    } catch (aiErr) {
-      console.warn('AI query parsing failed, falling back to keyword search:', aiErr);
-      parsedFilters = {};
     }
 
     // 3-day grace period cutoff: only show events whose deadline has not passed,

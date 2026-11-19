@@ -14,10 +14,28 @@ const app: Express = express();
 
 // CORS configuration
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const allowedOrigins = [
+  frontendUrl,
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
+];
+
 app.use(
   cors({
-    origin: frontendUrl,
-    credentials: true
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
+    credentials: true,
   })
 );
 

@@ -11,19 +11,28 @@ This project is being built frontend-first. All screens currently run on realist
 ## Structure
 
 - `frontend/` — Next.js (App Router) + Tailwind CSS + TypeScript. Active development is happening here.
-- `backend/` — Not started yet. Will be Node.js + Express + PostgreSQL (via Prisma) once the frontend is far enough along.
+- `backend/` — Node.js + Express + PostgreSQL (via Prisma). Running on port 5001.
 
-## Getting Started (Frontend)
+## Getting Started
+
+You can run both Frontend and Backend concurrently with a single command from the project root:
 
 ```bash
-cd frontend
-npm install
 npm run dev
 ```
 
-Then open:
-- `http://localhost:3000` — home
-- `http://localhost:3000/dev/components` — component library showcase (dev-only reference page)
+This starts:
+- **Backend API:** `http://localhost:5001/api`
+- **Frontend Web:** `http://localhost:3000`
+
+### Running Individually:
+- **Backend:** `cd backend && npm run dev`
+- **Frontend:** `cd frontend && npm run dev`
+
+### If a Port is Busy / Occupied:
+```bash
+npm run clean:ports
+```
 
 ## Roles (Dev Preview)
 

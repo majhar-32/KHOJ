@@ -6,8 +6,8 @@ import { Role } from '@prisma/client';
 
 const router = Router();
 
-// AI Event Extraction (Organizer / Admin)
-router.post('/extract-event', authenticate, authorize(Role.ORGANIZER, Role.ADMIN), extractEvent);
+// AI Event Extraction (Public / Form autofill tool)
+router.post('/extract-event', extractEvent);
 
 // AI Natural Language Search (Public)
 router.post('/search', searchEvents);

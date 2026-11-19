@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
 export class ApiError extends Error {
   statusCode: number;
@@ -46,10 +46,31 @@ export async function apiRequest<T = any>(
     reqHeaders['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
-    ...customConfig,
-    headers: reqHeaders,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...customConfig,
+      headers: reqHeaders,
+    });
+  } catch (err: unknown) {
+    // If backend is momentarily restarting or recovering, retry once automatically after 800ms
+    if (err instanceof TypeError && err.message.toLowerCase().includes('fetch')) {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        response = await fetch(url, {
+          ...customConfig,
+          headers: reqHeaders,
+        });
+      } catch {
+        throw new ApiError(
+          'Server is temporarily unreachable. Please check if the backend is running.',
+          503
+        );
+      }
+    } else {
+      throw err;
+    }
+  }
 
   if (response.status === 204) {
     return {} as T;

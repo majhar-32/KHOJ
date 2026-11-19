@@ -114,6 +114,9 @@ export interface ExtractedEventData {
   prizePool?: string | null;
   eligibility?: string | null;
   teamSize?: string | null;
+  contactInfo?: string | null;
+  registrationLink?: string | null;
+  officialWebsite?: string | null;
   description?: string | null;
 }
 

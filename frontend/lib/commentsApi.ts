@@ -1,6 +1,6 @@
 import { KhojComment } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
 export const fetchCommentsByEventId = async (eventId: string): Promise<KhojComment[]> => {
   const response = await fetch(`${API_BASE_URL}/comments/event/${eventId}`, {

@@ -15,7 +15,7 @@ Copy `.env.example` to `.env`:
 cp .env.example .env
 ```
 
-Ensure `PORT` (default: `5000`) and `FRONTEND_URL` (default: `http://localhost:3000`) are set.
+Ensure `PORT` (default: `5001`) and `FRONTEND_URL` (default: `http://localhost:3000`) are set.
 
 ### 3. Run Development Server
 ```bash
@@ -30,6 +30,6 @@ npm start
 
 ### 5. Health Check
 ```bash
-curl http://localhost:5000/api/health
+curl http://localhost:5001/api/health
 ```
 

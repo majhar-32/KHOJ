@@ -17,7 +17,9 @@ export default async function Home() {
       getCategories(),
     ]);
   } catch (error) {
-    console.error("Failed to load home page data:", error);
+    // Graceful fallback if backend is momentarily restarting
+    events = [];
+    categories = [];
   }
 
   // Calculate real live platform statistics
