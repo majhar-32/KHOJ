@@ -27,3 +27,25 @@ server.on('error', (err: any) => {
     throw err;
   }
 });
+
+// Fast graceful shutdown for tsx watch & restarts — prevents port-locking and 5s force-kill delays
+const shutdown = (signal: string) => {
+  // Close all idle/active HTTP connections immediately so port 5001 is freed instantaneously
+  if (typeof (server as any).closeAllConnections === 'function') {
+    (server as any).closeAllConnections();
+  }
+  server.close(async () => {
+    try {
+      await prisma.$disconnect();
+    } catch {}
+    process.exit(0);
+  });
+
+  // Force exit after 300ms if any lingering socket remains
+  setTimeout(() => {
+    process.exit(0);
+  }, 300).unref();
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

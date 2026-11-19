@@ -1,6 +1,5 @@
 import { AuthUser } from "./authApi";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+import { apiRequest } from "./api";
 
 export interface UpdateProfileData {
   name?: string;
@@ -43,21 +42,11 @@ export async function updateProfile(
   data: UpdateProfileData,
   token: string
 ): Promise<{ user: AuthUser }> {
-  const res = await fetch(`${API_BASE_URL}/auth/me`, {
+  return apiRequest<{ user: AuthUser }>("/auth/me", {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    token,
     body: JSON.stringify(data),
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to update profile");
-  }
-
-  return result;
 }
 
 /**
@@ -75,20 +64,11 @@ export async function uploadProfilePicture(
     formData.append("picture", fileOrFormData);
   }
 
-  const res = await fetch(`${API_BASE_URL}/auth/me/picture`, {
+  return apiRequest<{ user: AuthUser; profilePictureUrl: string }>("/auth/me/picture", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    token,
     body: formData,
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to upload profile picture");
-  }
-
-  return result;
 }
 
 /**
@@ -98,21 +78,11 @@ export async function changePassword(
   data: ChangePasswordData,
   token: string
 ): Promise<{ message: string }> {
-  const res = await fetch(`${API_BASE_URL}/auth/change-password`, {
+  return apiRequest<{ message: string }>("/auth/change-password", {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    token,
     body: JSON.stringify(data),
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to change password");
-  }
-
-  return result;
 }
 
 /**
@@ -122,37 +92,17 @@ export async function toggleRegisterEvent(
   eventId: string,
   token: string
 ): Promise<RegisterEventResponse> {
-  const res = await fetch(`${API_BASE_URL}/events/${eventId}/register`, {
+  return apiRequest<RegisterEventResponse>(`/events/${eventId}/register`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    token,
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to update event registration");
-  }
-
-  return result;
 }
 
 /**
  * Fetch profile stats (role-specific: saved & registered counts for USER, event breakdown for ORGANIZER)
  */
 export async function getProfileStats(token: string): Promise<ProfileStats> {
-  const res = await fetch(`${API_BASE_URL}/auth/me/stats`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  return apiRequest<ProfileStats>("/auth/me/stats", {
+    token,
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to fetch profile statistics");
-  }
-
-  return result;
 }

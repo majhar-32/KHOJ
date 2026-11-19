@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+import { apiRequest } from "./api";
 
 export interface AuthUser {
   id: string;
@@ -32,51 +32,21 @@ export interface LoginData {
 }
 
 export async function signup(data: SignupData): Promise<AuthResponse> {
-  const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+  return apiRequest<AuthResponse>("/auth/signup", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to sign up");
-  }
-
-  return result;
 }
 
 export async function login(data: LoginData): Promise<AuthResponse> {
-  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+  return apiRequest<AuthResponse>("/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Failed to log in");
-  }
-
-  return result;
 }
 
 export async function getMe(token: string): Promise<{ user: AuthUser }> {
-  const res = await fetch(`${API_BASE_URL}/auth/me`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  return apiRequest<{ user: AuthUser }>("/auth/me", {
+    token,
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Unauthorized");
-  }
-
-  return result;
 }
