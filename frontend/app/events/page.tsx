@@ -1,22 +1,14 @@
 import { getEvents, getCategories } from "@/lib/eventsApi";
 import { BrowseEventsClient } from "@/components/BrowseEventsClient";
-
 import { Suspense } from "react";
 
 export const dynamic = 'force-dynamic';
 
 export default async function BrowseEventsPage() {
-  let events: any[] = [];
-  let categories: string[] = [];
-
-  try {
-    [events, categories] = await Promise.all([
-      getEvents(),
-      getCategories()
-    ]);
-  } catch (error) {
-    console.error("Failed to load browse events data:", error);
-  }
+  const [events, categories] = await Promise.all([
+    getEvents(),
+    getCategories()
+  ]);
 
   return (
     <div className="min-h-screen bg-bg-page text-text-primary transition-colors">
