@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { KhojEvent } from "@/lib/types";
 import { EventCard } from "@/components/EventCard";
-import { FilterX, X, Sparkles } from "lucide-react";
+import { FilterX, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import { Select } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { AISearchBar } from "@/components/AISearchBar";
@@ -21,15 +21,22 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
   const router = useRouter();
   const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
-  
+
   const initialQ = searchParams.get("q") || "";
   const initialCategory = searchParams.get("category") || "all";
-  
+  const initialAI = searchParams.get("ai") === "true";
+
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedMode, setSelectedMode] = useState("all");
   const [selectedCity, setSelectedCity] = useState("all");
   const [deadlineBefore, setDeadlineBefore] = useState<string | null>(null);
+
+  // AI search state — OFF by default for fast, instantaneous searching
+  const [isAISearchActive, setIsAISearchActive] = useState(false);
+  const [aiSearchResults, setAiSearchResults] = useState<KhojEvent[] | null>(null);
+  const [isAISearching, setIsAISearching] = useState(false);
+  const [aiNotice, setAiNotice] = useState<string | null>(null);
 
   useEffect(() => {
     const catParam = searchParams.get("category");
@@ -38,39 +45,77 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     }
   }, [searchParams]);
 
-  // Real AI search results
-  const [aiSearchResults, setAiSearchResults] = useState<KhojEvent[] | null>(null);
-  const [aiSearchDone, setAiSearchDone] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(!!initialQ);
-
   // Extract unique cities from events
   const cities = useMemo(() => {
-    const uniqueCities = Array.from(new Set(initialEvents.map((e) => e.city)));
+    const uniqueCities = Array.from(new Set(initialEvents.map((e) => e.city).filter(Boolean)));
     return uniqueCities.sort();
   }, [initialEvents]);
 
-  const handleAISearch = async (query: string, directResults?: KhojEvent[]) => {
-    if (!query.trim()) return;
-    
+  // Fast standard search handler — updates query instantly in memory
+  const handleNormalSearch = (query: string) => {
     setSearchQuery(query);
-    setIsInitializing(true);
+    if (isAISearchActive) {
+      setIsAISearchActive(false);
+      setAiSearchResults(null);
+    }
+    setAiNotice(null);
+
+    // Sync URL smoothly without reload
+    const params = new URLSearchParams(window.location.search);
+    if (query.trim()) {
+      params.set("q", query.trim());
+      params.delete("ai");
+    } else {
+      params.delete("q");
+      params.delete("ai");
+    }
+    const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
+    router.replace(newUrl, { scroll: false });
+  };
+
+  // Optional AI Search handler — only triggered when user explicitly asks for it
+  const handleAISearch = async (queryToSearch = searchQuery) => {
+    const q = queryToSearch.trim();
+    if (!q) return;
+
+    setIsAISearching(true);
+    setAiNotice(null);
 
     try {
-      const results = directResults || (await searchEvents(query));
+      const results = await searchEvents(q);
       setAiSearchResults(results);
-      setAiSearchDone(true);
+      setIsAISearchActive(true);
+      setAiNotice(`AI analyzed "${q}" and found ${results.length} relevant event${results.length === 1 ? "" : "s"}.`);
     } catch {
+      // Graceful fallback to fast standard search
+      setIsAISearchActive(false);
       setAiSearchResults(null);
-      setAiSearchDone(true);
+      setAiNotice("AI search took longer than expected. Showing fast standard keyword results.");
     } finally {
-      setIsInitializing(false);
+      setIsAISearching(false);
     }
 
-    // Update URL without triggering a full reload
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("q", query);
-    router.replace(`/events?${params.toString()}`);
+    const params = new URLSearchParams(window.location.search);
+    params.set("q", q);
+    params.set("ai", "true");
+    router.replace(`/events?${params.toString()}`, { scroll: false });
   };
+
+  const resetToStandardSearch = () => {
+    setIsAISearchActive(false);
+    setAiSearchResults(null);
+    setAiNotice(null);
+    const params = new URLSearchParams(window.location.search);
+    params.delete("ai");
+    router.replace(params.toString() ? `/events?${params.toString()}` : "/events", { scroll: false });
+  };
+
+  // Only trigger AI search on initial mount IF URL explicitly had ?ai=true
+  useEffect(() => {
+    if (initialAI && initialQ) {
+      handleAISearch(initialQ);
+    }
+  }, []);
 
   // Redirect unauthenticated visitors to /login
   useEffect(() => {
@@ -104,26 +149,26 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     });
   };
 
-  // Handle URL search on mount
-  useEffect(() => {
-    if (initialQ) {
-      handleAISearch(initialQ);
-    }
-  }, []);
-
+  // Instant in-memory filtering (0ms latency, runs synchronously)
   const filteredEvents = useMemo(() => {
-    const baseList = aiSearchResults !== null ? aiSearchResults : initialEvents;
+    const baseList = isAISearchActive && aiSearchResults !== null ? aiSearchResults : initialEvents;
+    const q = searchQuery.trim().toLowerCase();
+
     return baseList.filter((event) => {
-      const matchesSearch = 
-        aiSearchResults !== null ||
-        !searchQuery ||
-        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.organizerName.toLowerCase().includes(searchQuery.toLowerCase());
-      
+      const matchesSearch =
+        (isAISearchActive && aiSearchResults !== null) ||
+        !q ||
+        (event.name && event.name.toLowerCase().includes(q)) ||
+        (event.organizerName && event.organizerName.toLowerCase().includes(q)) ||
+        (event.category && event.category.toLowerCase().includes(q)) ||
+        (event.city && event.city.toLowerCase().includes(q)) ||
+        (event.venue && event.venue.toLowerCase().includes(q)) ||
+        (event.description && event.description.toLowerCase().includes(q));
+
       const matchesCategory = selectedCategory === "all" || event.category === selectedCategory;
       const matchesMode = selectedMode === "all" || event.mode === selectedMode;
       const matchesCity = selectedCity === "all" || event.city === selectedCity;
-      
+
       let matchesDeadline = true;
       if (deadlineBefore) {
         matchesDeadline = new Date(event.registrationDeadline).getTime() <= new Date(deadlineBefore).getTime();
@@ -131,7 +176,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
 
       return matchesSearch && matchesCategory && matchesMode && matchesCity && matchesDeadline;
     });
-  }, [initialEvents, aiSearchResults, searchQuery, selectedCategory, selectedMode, selectedCity, deadlineBefore]);
+  }, [initialEvents, isAISearchActive, aiSearchResults, searchQuery, selectedCategory, selectedMode, selectedCity, deadlineBefore]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -139,14 +184,19 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
     setSelectedMode("all");
     setSelectedCity("all");
     setDeadlineBefore(null);
+    setIsAISearchActive(false);
     setAiSearchResults(null);
-    setAiSearchDone(false);
-    
-    // Clear URL query
-    router.replace('/events');
+    setAiNotice(null);
+    router.replace("/events");
   };
 
-  const hasActiveFilters = searchQuery !== "" || selectedCategory !== "all" || selectedMode !== "all" || selectedCity !== "all" || !!deadlineBefore || aiSearchResults !== null;
+  const hasActiveFilters =
+    searchQuery !== "" ||
+    selectedCategory !== "all" ||
+    selectedMode !== "all" ||
+    selectedCity !== "all" ||
+    !!deadlineBefore ||
+    isAISearchActive;
 
   return (
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:px-6">
@@ -156,12 +206,14 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        {/* Search Bar */}
+        {/* Fast Standard Search Bar with optional AI Search button */}
         <div className="flex-1">
-          <AISearchBar 
+          <AISearchBar
             initialValue={searchQuery}
-            onSearch={(q) => handleAISearch(q)} 
-            inputClassName="py-2.5" 
+            onSearch={handleNormalSearch}
+            onAISearch={handleAISearch}
+            isAISearching={isAISearching}
+            inputClassName="py-2.5"
           />
         </div>
 
@@ -171,7 +223,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
-              setAiSearchResults(null);
+              if (isAISearchActive) setIsAISearchActive(false);
             }}
             className="w-full sm:w-40"
           >
@@ -185,7 +237,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
             value={selectedMode}
             onChange={(e) => {
               setSelectedMode(e.target.value);
-              setAiSearchResults(null);
+              if (isAISearchActive) setIsAISearchActive(false);
             }}
             className="w-full sm:w-32"
           >
@@ -198,7 +250,7 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
             value={selectedCity}
             onChange={(e) => {
               setSelectedCity(e.target.value);
-              setAiSearchResults(null);
+              if (isAISearchActive) setIsAISearchActive(false);
             }}
             className="w-full sm:w-36"
             disabled={selectedMode === "online"}
@@ -218,30 +270,36 @@ export function BrowseEventsClient({ initialEvents, categories }: BrowseEventsCl
         </div>
       </div>
 
-      {/* AI Search Indicator */}
-      {aiSearchDone && searchQuery && (
-        <div className="mb-8 p-3 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-between gap-3">
+      {/* AI Search Loading State */}
+      {isAISearching && (
+        <div className="mb-6 p-4 rounded-xl bg-accent/10 border border-accent/30 flex items-center gap-3">
+          <Loader2 className="w-5 h-5 text-accent animate-spin shrink-0" />
+          <p className="text-sm text-text-primary font-medium">
+            AI is analyzing your natural language query: &ldquo;{searchQuery}&rdquo;...
+          </p>
+        </div>
+      )}
+
+      {/* AI Search Active Banner */}
+      {isAISearchActive && (
+        <div className="mb-6 p-3.5 rounded-xl bg-accent/15 border border-accent/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
+            <Sparkles className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
             <span className="text-sm text-text-primary font-medium">
-              AI search results for &ldquo;{searchQuery}&rdquo; ({filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} found)
+              {aiNotice || `AI Smart Search active for "${searchQuery}"`} ({filteredEvents.length} {filteredEvents.length === 1 ? "event" : "events"} found)
             </span>
           </div>
           <button
-            onClick={clearFilters}
-            className="text-xs text-accent hover:underline font-semibold"
+            onClick={resetToStandardSearch}
+            className="text-xs text-accent hover:underline font-semibold whitespace-nowrap self-end sm:self-auto cursor-pointer"
           >
-            Reset search
+            Switch to Standard Fast Search
           </button>
         </div>
       )}
 
       {/* Results */}
-      {isInitializing ? (
-        <div className="text-center py-20 bg-bg-surface rounded-2xl border border-border-default">
-          <p className="text-accent font-medium">Analyzing search query...</p>
-        </div>
-      ) : filteredEvents.length > 0 ? (
+      {filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredEvents.map((event) => (
             <EventCard
