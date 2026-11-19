@@ -46,30 +46,35 @@ export async function apiRequest<T = any>(
     reqHeaders['Authorization'] = `Bearer ${token}`;
   }
 
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      ...customConfig,
-      headers: reqHeaders,
-    });
-  } catch (err: unknown) {
-    // If backend is momentarily restarting or recovering, retry once automatically after 800ms
-    if (err instanceof TypeError && err.message.toLowerCase().includes('fetch')) {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        response = await fetch(url, {
-          ...customConfig,
-          headers: reqHeaders,
-        });
-      } catch {
+  let response: Response | undefined;
+  const maxRetries = 3;
+  const retryDelays = [600, 1000, 1500];
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      response = await fetch(url, {
+        ...customConfig,
+        headers: reqHeaders,
+      });
+      break;
+    } catch (err: unknown) {
+      const isFetchError = err instanceof TypeError && err.message.toLowerCase().includes('fetch');
+      if (isFetchError && attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelays[attempt]));
+        continue;
+      }
+      if (isFetchError) {
         throw new ApiError(
           'Server is temporarily unreachable. Please check if the backend is running.',
           503
         );
       }
-    } else {
       throw err;
     }
+  }
+
+  if (!response) {
+    throw new ApiError('No response received from server.', 500);
   }
 
   if (response.status === 204) {
