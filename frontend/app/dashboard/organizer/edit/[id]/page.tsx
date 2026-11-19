@@ -10,8 +10,9 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   let categories: string[] = [];
   try {
     [event, categories] = await Promise.all([getEventById(id), getCategories()]);
-  } catch (error) {
-    console.error("Error loading edit event data:", error);
+  } catch {
+    event = undefined;
+    categories = [];
   }
 
   if (!event) notFound();

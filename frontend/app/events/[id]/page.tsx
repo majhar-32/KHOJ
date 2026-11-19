@@ -9,8 +9,8 @@ export default async function EventDetailsPage({ params }: { params: Promise<{ i
   let event;
   try {
     event = await getEventById(id);
-  } catch (error) {
-    console.error("Error fetching event:", error);
+  } catch {
+    event = undefined;
   }
 
   if (!event) notFound();

@@ -9,8 +9,34 @@ export interface EventFilterParams {
   [key: string]: unknown;
 }
 
+export const DEFAULT_CATEGORIES: string[] = [
+  "AI Competition",
+  "Business Case Competition",
+  "Career Fair",
+  "Cultural Event",
+  "Debate Competition",
+  "Design Contest",
+  "Gaming Tournament",
+  "Hackathon",
+  "Job Fair",
+  "Olympiad",
+  "Photography Contest",
+  "Programming Contest",
+  "Robotics Competition",
+  "Seminar",
+  "Sports Tournament",
+  "Startup Competition",
+  "Webinar",
+  "Workshop",
+];
+
 export async function getEvents(params?: EventFilterParams): Promise<KhojEvent[]> {
-  return apiRequest<KhojEvent[]>("/events", { params });
+  try {
+    return await apiRequest<KhojEvent[]>("/events", { params });
+  } catch (error) {
+    // Return empty list gracefully during server reboot or connection hiccups
+    return [];
+  }
 }
 
 export async function getAllEventsForAdmin(token?: string | null): Promise<KhojEvent[]> {
@@ -98,7 +124,12 @@ export async function toggleSaveEvent(
 }
 
 export async function getCategories(): Promise<string[]> {
-  return apiRequest<string[]>("/categories");
+  try {
+    const categories = await apiRequest<string[]>("/categories");
+    return categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
+  } catch (error) {
+    return DEFAULT_CATEGORIES;
+  }
 }
 
 export interface ExtractedEventData {
